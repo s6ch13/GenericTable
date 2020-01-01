@@ -1,0 +1,40 @@
+// Common Build file for Generic Table 
+
+// The below lines are passed from the common builds
+//plugins {
+//  	id 'org.openjfx.javafxplugin' 
+//}
+// ext.jdkver = 11
+
+project.version = '1.0.4.0'
+	
+
+if (jdkver == 11) {
+	javafx {
+    	modules = [ 'javafx.controls','javafx.fxml' ]
+
+    	version = "11.0.2"
+	}
+}
+
+
+
+
+
+dependencies {
+
+    // controlsfx & jfoenix         
+    if (jdkver == 1.8) { 
+        compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
+    } else if (jdkver >= 11) { 
+	    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
+    }
+	compile 'commons-lang:commons-lang:2.6'
+}
+
+ 
+tasks.withType(JavaCompile) {
+    options.warnings = false
+}
+
+build.dependsOn
