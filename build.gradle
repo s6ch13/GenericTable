@@ -1,24 +1,73 @@
 // Common Build file for Generic Table 
 
-// The below lines are passed from the common builds
-//plugins {
-//  	id 'org.openjfx.javafxplugin' 
-//}
-// ext.jdkver = 11
-
-project.version = '1.0.4.0'
+plugins {
+  	id 'application'
+  	id 'eclipse'
+  	
+  	id 'org.openjfx.javafxplugin' version '0.0.5' 
+    //id "org.kordamp.gradle.jdeps" version "0.5.0" 
+}
+ext.jdkver = 11
+    apply plugin: 'java'
+	apply plugin: 'eclipse'
 	
+project.version = '1.0.4.0'
 
-if (jdkver == 11) {
-	javafx {
-    	modules = [ 'javafx.controls','javafx.fxml' ]
+	repositories {
+	    // Use 'jcenter' for resolving your dependencies.
+	    // You can declare any Maven/Ivy/file repository here.
+	    mavenLocal()
+	    jcenter()
+	    //mavenCentral()
+	    
+//	    maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+	    
+	}	
+	 
+    javafx {
+        modules = [ 'javafx.controls','javafx.fxml', 'javafx.web', 'javafx.swing' ]
+        version = "11.0.2"
+        }
+	
+sourceSets {
+        main {
+                java {
+                        srcDirs= ["src/main/java"]
+                        outputDir = file("${buildDir}/classes")
+                        exclude '**/ignorecompile/**'
+                        
+                }
+                resources {
+                        srcDirs= ["src/main/java/"]
+                }
+        }
+}
 
+
+if (jdkver >= 11) { 
+ 
+	apply plugin:  'org.openjfx.javafxplugin' 
+ 
+    javafx {
+    	modules = [ 'javafx.controls','javafx.fxml', 'javafx.web', 'javafx.swing' ]
     	version = "11.0.2"
 	}
 }
 
-
-
+// Dependencies
+dependencies {
+    // controlsfx & jfoenix         
+    if (jdkver == 1.8) { 
+        compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
+    	compile 'com.jfoenix:jfoenix:8.0.2' // Java 8    
+    } else if (jdkver >= 11) { 
+	    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
+	    compile 'com.jfoenix:jfoenix:9.0.9' // Java 9 and above
+    }
+     compile 'commons-lang:commons-lang:2.6'   
+}
 
 
 dependencies {
@@ -32,9 +81,42 @@ dependencies {
 	compile 'commons-lang:commons-lang:2.6'
 }
 
+mainClassName = 'tableapp.Main'
+
  
 tasks.withType(JavaCompile) {
     options.warnings = false
 }
 
-build.dependsOn
+jar {
+
+    archiveName = "tableapp.jar"
+
+    from {
+
+      configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+       }
+
+      configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+       }
+     }
+    
+//    from processResources              
+//    into('lib') {
+ //       from configurations.runtime
+ //   }
+
+     manifest {
+        attributes (
+        'Main-Class': 'tableapp.Main',
+         // add classpath to Manifest; see http://stackoverflow.com/questions/30087427/add-classpath-in-manifest-file-of-jar-in-gradle
+         //"Class-Path": '. lib/' + configurations.default.collect { it.getName() }.join(' lib/')
+        )
+        
+     }
+
+   exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+

@@ -1,0 +1,118 @@
+/*
+	root.css
+	
+	Copyright (C) 2019  Sriram C.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see www.gnu.org/licenses.
+*/
+
+#pane, 
+.root {
+	-fx-border-color: #83AEF2;	
+	
+	    -fx-accent:  #5d93ea;
+	
+
+}
+
+
+.label {
+}
+
+.label-bright {
+}
+
+.label-header {
+}
+
+.table-view {
+	-fx-border-radius: 5 5 5 5;
+  -fx-background-radius: 5 5 5 5;
+  	-fx-border-color: transparent
+}
+
+.scroll-pane { 
+	-fx-background-color: transparent
+}
+
+.table-view .column-header .label {
+    -fx-alignment: CENTER;
+    -fx-opacity: 1;
+}
+
+.table-column {
+  -fx-alignment: CENTER_RIGHT;
+  	-fx-border-radius: 5 5 5 5;
+  -fx-background-radius: 5 5 5 5;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected {
+}
+
+
+.text-field {
+  -fx-border-radius: 5 5 5 5;
+  -fx-background-radius: 5 5 5 5;
+
+  /* top-left, top-right, bottom-right, and bottom-left corners, in that 
+  order. */
+ }
+
+
+.jfx-button {
+     -jfx-button-type: RAISED;
+     -fx-background-color: #83AEF2;
+     -fx-text-fill: white;
+}
+
+
+#custom-titled-pane{
+	-fx-border-radius: 5 5 5 5;
+	-fx-border-insets: 8 0 0 0 ;
+	-fx-border-color: grey
+}
+
+#custom-titled-pane-label{
+	-fx-border-radius: 5 5 5 5;
+	-fx-padding: 0 5; 
+	-fx-border-color: grey; 
+	-fx-background-color: #FFFFFF;
+}
+
+
+#folder-button {
+    -fx-background-image: url(../Resources/Images/folder.png);
+    -fx-background-color: transparent;
+    
+    -fx-background-size: 32px 26px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#legend_label{
+	-fx-border-color: transparent;	
+   -fx-background-color:  transparent;
+   -fx-font-size: 10px;
+   -fx-text-alignment:left;
+   -fx-hpos:left;
+   
+}
+
+#chart_background_rotate { 
+    -fx-padding: 10px;
+    -fx-background-image: url("../Resources/Images/FullWatermarkRotate.png");
+    -fx-background-position: right top;
+    -fx-background-repeat: no-repeat, no-repeat;
+    -fx-background-size:15, 164;	
+}
