@@ -18,8 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see www.gnu.org/licenses. -->
 
-	
-
 
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -33,47 +31,50 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 
-<BorderPane minHeight="625.0" minWidth="1100" stylesheets="@root.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tableapp.RootPaneController">
+<BorderPane minHeight="390" minWidth="300"
+	stylesheets="@root.css" xmlns="http://javafx.com/javafx/10.0.1"
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="tableapp.RootPaneController">
 
 	<top>
-	<MenuBar id="MenuBar" xmlns="http://javafx.com/javafx/8.0.65"
-	xmlns:fx="http://javafx.com/fxml/1" >
-	<menus>
-		<Menu mnemonicParsing="false" text="File">
-			<items>					
-				<MenuItem fx:id="MenuClose" mnemonicParsing="false"
-					onAction="#MenuFileClose" text="Close" />
-			</items>
-		</Menu>
-		<Menu mnemonicParsing="false" text="Edit">
-			<items>
-				<MenuItem fx:id="MenuCut" mnemonicParsing="false"
-					onAction="#MenuCut" text="Cut" />
-				<MenuItem fx:id="MenuCopy" mnemonicParsing="false"
-					onAction="#MenuCopy" text="Copy" />
-				<MenuItem fx:id="MenuPaste" mnemonicParsing="false"
-					onAction="#MenuPaste" text="Paste" />
-				<MenuItem fx:id="MenuDelete" mnemonicParsing="false"
-					onAction="#MenuDelete" text="Delete" />
-			</items>
-		</Menu>
-	</menus>
-</MenuBar>
-	
-	
+		<MenuBar id="MenuBar" xmlns="http://javafx.com/javafx/8.0.65"
+			xmlns:fx="http://javafx.com/fxml/1">
+			<menus>
+				<Menu mnemonicParsing="false" text="File">
+					<items>
+						<MenuItem fx:id="MenuClose" mnemonicParsing="false"
+							onAction="#MenuFileClose" text="Close" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="Edit">
+					<items>
+						<MenuItem fx:id="MenuCut" mnemonicParsing="false"
+							onAction="#MenuCut" text="Cut" />
+						<MenuItem fx:id="MenuCopy" mnemonicParsing="false"
+							onAction="#MenuCopy" text="Copy" />
+						<MenuItem fx:id="MenuPaste" mnemonicParsing="false"
+							onAction="#MenuPaste" text="Paste" />
+						<MenuItem fx:id="MenuDelete" mnemonicParsing="false"
+							onAction="#MenuDelete" text="Delete" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+
+
 	</top>
 
 	<center>
 
-						<AnchorPane fx:id="ThicknessTableHolder">
+		<AnchorPane fx:id="PersonsTableHolder">
 
-							<fx:include fx:id="ThicknessTable"
-									source="ThicknessTable.fxml" />
-							<HBox.margin>
-								<Insets left="10.0" right="10.0" top="20.0" />
-							</HBox.margin>
+			<fx:include fx:id="PersonsTable"
+				source="PersonsTable.fxml" />
+			<HBox.margin>
+				<Insets left="10.0" right="10.0" top="20.0" />
+			</HBox.margin>
 
-						</AnchorPane>
+		</AnchorPane>
 
 	</center>
 </BorderPane>

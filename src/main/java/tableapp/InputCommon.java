@@ -21,8 +21,6 @@ package tableapp;
 import java.util.Arrays;
 import java.util.List;
 
-
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -38,8 +36,8 @@ public class InputCommon {
 		return inputCommon;
 	}
 
-	static int nth; // number of thickness specified.  ( also equal to nfr)
-	static ObservableList<ThicknessTableData> thData = FXCollections.observableArrayList();
+	static int np; // number of Persons in table
+	static ObservableList<PersonsTableData> personData = FXCollections.observableArrayList();
 
 	
 	public void init() {
@@ -48,35 +46,36 @@ public class InputCommon {
 
 
 
-	public void setNth(int nth) {
-		InputCommon.nth = nth;
+	public void setNp(int np) {
+		InputCommon.np = np;
 	}
 
 
 
-	public int getNth() {
-		return InputCommon.nth;
+	public int getNp() {
+		return InputCommon.np;
 	}
 
 	
 	
-	public List<Thickness> initThData() {
-		return Arrays.asList(new Thickness(1, 0.0, 0.0));
+	public List<Persons> initPersonData() {
+		return Arrays.asList();
 	}
-	public boolean addTh(Thickness thp) {
+	
+	public boolean addPerson(Persons thp) {
 		
-		thData.add(new ThicknessTableData(thp));
+		personData.add(new PersonsTableData(thp));
 		return true;
 	}
 
-	public boolean addTh(int row,Thickness thp) {
+	public boolean addPerson(int row,Persons pp) {
 		
-		nth++;
-		thData.add(row,new ThicknessTableData(thp));
+		np++;
+		personData.add(row,new PersonsTableData(pp));
 		
 		// shift indices up
-		for (int i = row; i < nth; i++) {
-			thData.get(i).setIndex(i+1);
+		for (int i = row; i < np; i++) {
+			personData.get(i).setIndex(i+1);
 		}
 		
 		return true;
@@ -84,14 +83,14 @@ public class InputCommon {
 	
 
 
-	public boolean deleteTh(int index) {
-		if (index <= thData.size() && thData.size() > 0 && nth > 1) {
-			thData.remove(index);
-			nth--;
+	public boolean deletePerson(int index) {
+		if (index <= personData.size() && personData.size() > 0 && np > 0) {
+			personData.remove(index);
+			np--;
 						
 			// shift indices down
-			for (int i = index; i < nth; i++) {
-				thData.get(i).setIndex(i+1);
+			for (int i = index; i < np; i++) {
+				personData.get(i).setIndex(i+1);
 			}
 				
 			return true;
@@ -103,29 +102,29 @@ public class InputCommon {
 
 
 	
-	public ObservableList<ThicknessTableData> getThData() {
-		return InputCommon.thData;
+	public ObservableList<PersonsTableData> getPersonData() {
+		return InputCommon.personData;
 	}
 
 
 
-	public void setThData(int row, int col, String val) {
-		ThicknessTableData thtd = thData.get(row);
-		thtd.updateCol(col, val);
-		InputCommon.thData.set(row, thtd);
+	public void setPersonData(int row, int col, String val) {
+		PersonsTableData ptd = personData.get(row);
+		ptd.updateCol(col, val);
+		InputCommon.personData.set(row, ptd);
 	}
 
 	
 	public void clearValues() {
 
 		
-		nth = 0;
+		np = 0;
 		
-		thData.clear();
+		personData.clear();
 	}
 
-    public void defaultTh(final List<Thickness> thp) {
-        thp.forEach(p -> thData.add(new ThicknessTableData(p)));
+    public void defaultPerson(final List<Persons> pp) {
+        pp.forEach(p -> personData.add(new PersonsTableData(p)));
     }
 	
 	public void defaultValues() {
@@ -134,21 +133,21 @@ public class InputCommon {
 		clearValues();
 
 		// set default values;
-		nth =1;
-		defaultTh(initThData());
+		np =0;
+		defaultPerson(initPersonData());
 	}
 
 	
 
-	public Object[][] getThicknessTable() {
-		if (getNth() == 0)
+	public Object[][] getPersonTable() {
+		if (getNp() == 0)
 			return null;
 
-		Object obj[][] = new Object[getNth()][3];
-		for (int i = 0; i < getNth(); i++) {
-			obj[i][0] = thData.get(i).getIndex();
-			obj[i][1] = thData.get(i).getThv();
-			obj[i][2] = thData.get(i).getXth();
+		Object obj[][] = new Object[getNp()][3];
+		for (int i = 0; i < getNp(); i++) {
+			obj[i][0] = personData.get(i).getIndex();
+			obj[i][1] = personData.get(i).getName();
+			obj[i][2] = personData.get(i).getAge();
 		}
 		return obj;
 	}
@@ -162,12 +161,11 @@ public class InputCommon {
 		System.out.println("------");
 		
 
-		System.out.println("NTH=" + InputCommon.nth );
-		System.out.println("Thickness");
-		for (int i = 0; i < thData.size(); i++) {
-			thData.get(i).printThPoint();
+		System.out.println("Number of Persons=" + InputCommon.np );
+		System.out.println("Persons:");
+		for (int i = 0; i < personData.size(); i++) {
+			personData.get(i).printThPoint();
 		}
-
 
 	}
 

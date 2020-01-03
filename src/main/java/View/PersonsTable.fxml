@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-	ThicknessTable.java
+	PersonsTable.java
 	
 	Copyright (C) 2019  Sriram C.
 
@@ -29,9 +29,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="custom-titled-pane" styleClass="root" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tableapp.ThicknessTableController">
+<AnchorPane id="custom-titled-pane" styleClass="root" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tableapp.PersonsTableController">
 	<children>
-		<Label id="custom-titled-pane-label" alignment="TOP_LEFT" layoutX="20.0" text="Pile Thickness Table" />
+		<Label id="custom-titled-pane-label" alignment="TOP_LEFT" layoutX="20.0" text="Persons Table" />
 
 		<AnchorPane maxHeight="300.0" maxWidth="500.0" minHeight="270.0" minWidth="280.0" prefHeight="270.0" prefWidth="280.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
 			<VBox alignment="TOP_RIGHT" prefHeight="265.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
@@ -57,14 +57,14 @@
 								</cellValueFactory>
 							</TableColumn>
 
-							<TableColumn fx:id="thvColumn" prefWidth="100.0">
+							<TableColumn fx:id="nameColumn" prefWidth="100.0" text="Name">
 								<cellValueFactory>
-									<PropertyValueFactory property="thv" />
+									<PropertyValueFactory property="name" />
 								</cellValueFactory>
 							</TableColumn>
-							<TableColumn prefWidth="100.0" fx:id="xthColumn">
+							<TableColumn prefWidth="100.0" fx:id="ageColumn" text="Age">
 								<cellValueFactory>
-									<PropertyValueFactory property="xth" />
+									<PropertyValueFactory property="age" />
 								</cellValueFactory>
 							</TableColumn>
 

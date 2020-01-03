@@ -22,27 +22,12 @@ package tableapp;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.controlsfx.control.Notifications;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuBar;
-import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.Duration;
 
 
 public class MainApp extends Application {
@@ -52,8 +37,6 @@ public class MainApp extends Application {
     private ResourceBundle bundle;
     
     private RootPaneController rootPaneController;
-
-    //private MenuBarController menuBarController;
 
 
 	@Override
@@ -67,7 +50,6 @@ public class MainApp extends Application {
         });
 
         initRootLayout();
-        //showMenuBar();        
 	}
 	
 	
@@ -114,36 +96,18 @@ public class MainApp extends Application {
         return primaryStage;
     }
     
-/*    public void showMenuBar() {
-        try {
-            // Load menuBar
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/View/MenuBar.fxml"));
-            
-            MenuBar menuBar = (MenuBar) loader.load();
-            this.rootLayout.setTop(menuBar);
-            
-            // Give the controller access to the main app.
-            this.menuBarController = loader.getController();
-            this.menuBarController.setMainApp(this);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }    	
-    }
-
-    public MenuBarController getMenuBarController() {
-    	return this.menuBarController;
-    }
- */   
-    
-            
     
 	// Initialize all the systems before launching the GUI
 	public static  void initialize() {
 				
 		InputCommon iC = InputCommon.getInstance();
 		iC.init();		
+		
+		// Lets setup 3 names in this example to start.
+		// Row number starts at 0 while index starts with 1
+		iC.addPerson(0,new Persons(1,"Mary",23));
+		iC.addPerson(1,new Persons(2,"John",31));
+		iC.addPerson(2,new Persons(3,"Alex",53));
 	}
 	
 	public void exit() {

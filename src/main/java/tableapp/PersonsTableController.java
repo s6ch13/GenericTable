@@ -1,5 +1,5 @@
 /*
-	ThicknessTableController.java
+	PersonsTableController.java
 	
 	Copyright (C) 2019  Sriram C.
 
@@ -38,8 +38,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
+import javafx.util.StringConverter;
 
-public class ThicknessTableController extends GenericTableController implements Initializable{
+public class PersonsTableController extends GenericTableController implements Initializable{
 
 	// Reference to the main application.
     private MainApp mainApp;
@@ -51,18 +52,17 @@ public class ThicknessTableController extends GenericTableController implements 
 
     
 	@FXML
-	protected TableView<ThicknessTableData> table;
+	protected TableView<PersonsTableData> table;
 
 	@FXML
-	private TableColumn<ThicknessTableData, Integer> indexColumn;
+	private TableColumn<PersonsTableData, Integer> indexColumn;
 
 	@FXML
-	private TableColumn<ThicknessTableData, Float> thvColumn;
+	private TableColumn<PersonsTableData, String> nameColumn;
 
 	@FXML
-	private TableColumn<ThicknessTableData, Float> xthColumn;
+	private TableColumn<PersonsTableData, Integer> ageColumn;
 	
-	@FXML Label errorLabel;
 	
 	@Override
 	public void initialize(final URL url, final ResourceBundle rb) {
@@ -76,13 +76,12 @@ public class ThicknessTableController extends GenericTableController implements 
 
 		InputCommon iC = InputCommon.getInstance();
 		
- 		//initNthSpinner();
 		
-		table.setItems(iC.getThData());
+		table.setItems(iC.getPersonData());
 		
 		setupindexColumn();
-		setupthvColumn();
-		setupxthColumn();
+		setupNameColumn();
+		setupAgeColumn();
 
 		setTableEditable();
 
@@ -95,78 +94,89 @@ public class ThicknessTableController extends GenericTableController implements 
 	@Override
 	public String getValue(int row,int col) {
 		InputCommon iC = InputCommon.getInstance();
-		return  iC.getThData().get(row).getCol(col);
+		return  iC.getPersonData().get(row).getCol(col);
 	}
 	
 	@Override	
 	public void setValue(int row,int col,String val) {
-		System.out.println("set value - breadth table controller");
+		System.out.println("set value - persons controller");
 
 		InputCommon iC = InputCommon.getInstance();
-		iC.setThData(row,col,val);
+		iC.setPersonData(row,col,val);
 	}
 	
 	@Override	
 	public void clearValue(int row,int col) {
 		InputCommon iC = InputCommon.getInstance();
-		iC.setThData(row,col,new String("0"));
+		iC.setPersonData(row,col,new String("0"));
 	}	
 	
 		
 	private void setupindexColumn() {
 		
 		indexColumn.setCellFactory(
-				DragSelectionCell.<ThicknessTableData, Integer>forTableColumn(
+				DragSelectionCell.<PersonsTableData, Integer>forTableColumn(
 						new MyIntegerStringConverter()));
 		indexColumn.setEditable(false);
 		indexColumn.setSortable(false);
 	}
 
-	private void setupthvColumn() {
-		thvColumn.setCellFactory(
-				EditCell.<ThicknessTableData, Float>forTableColumn(
-						new MyFloatStringConverter("%.4f")));
+	private void setupNameColumn() {
+		nameColumn.setCellFactory(
+				EditCell.<PersonsTableData, String>forTableColumn(
+						new StringConverter<String>() {
+							@Override
+							public String toString(String s) {
+								return s;
+							}
+
+							@Override
+							public String fromString(String s) {
+								return s;
+							}
+						}											
+						));
 		// updates the thv field on the ThicknessyTableData object to the
 		// committed value
-		thvColumn.setOnEditCommit(event -> {
+		nameColumn.setOnEditCommit(event -> {
 			// Validate the input before committing
 			
 			InputCommon iC = InputCommon.getInstance();
 			int editRow = event.getTablePosition().getRow();
-			if (editRow >= iC.getNth() || editRow <0 ) {
+			if (editRow >= iC.getNp() || editRow <0 ) {
 				System.out.println("Edit event isssue, row count > rowmax, editrow=" + editRow);
 				return;
 			}			
 			
-			final float value = (event.getNewValue() != null) 
+			final String value = (event.getNewValue() != null) 
 					? event.getNewValue() : event.getOldValue();
 					
-			table.getItems().get(editRow).setThv(value);
+			table.getItems().get(editRow).setName(value);
 			refresh();
 	
 		});
 	}
 
-	private void setupxthColumn() {			
-		xthColumn.setCellFactory(
-				EditCell.<ThicknessTableData, Float>forTableColumn(
-						new MyFloatStringConverter("%.3f")));
+	private void setupAgeColumn() {			
+		ageColumn.setCellFactory(
+				EditCell.<PersonsTableData, Integer>forTableColumn(
+						new MyIntegerStringConverter()));
 		// updates the xth field on the ThicknessTableData object to the
 		// committed value
-		xthColumn.setOnEditCommit(event -> {			
+		ageColumn.setOnEditCommit(event -> {			
 			// Validate the input before committing
 			
 			InputCommon iC = InputCommon.getInstance();
 			int editRow = event.getTablePosition().getRow();
-			if (editRow >= iC.getNth() || editRow <0 ) {
+			if (editRow >= iC.getNp() || editRow <0 ) {
 				System.out.println("Edit event isssue, row count > rowmax, editrow=" + editRow);
 				return;
 			}
 			
-			final float value = (event.getNewValue() != null) 
+			final Integer value = (event.getNewValue() != null) 
 					? event.getNewValue() : event.getOldValue();
 
-			table.getItems().get(editRow).setXth(value);
+			table.getItems().get(editRow).setAge(value);
 			
 			refresh();
 
@@ -177,39 +187,40 @@ public class ThicknessTableController extends GenericTableController implements 
 	public void addRowBelow(ActionEvent event) { 
 		InputCommon iC = InputCommon.getInstance();
 
-		iC.setNth(iC.getNth() + 1);
-		iC.addTh(new Thickness(iC.getNth(),0.0,0.0));		
+		iC.setNp(iC.getNp() + 1);
+		iC.addPerson(new Persons(iC.getNp(),"",0));		
 	}
 
 	@FXML
 	public void delLastRow(ActionEvent event) { 
 		InputCommon iC = InputCommon.getInstance();
-		if (iC.getNth() > 0) {
-			iC.deleteTh(iC.getNth() -1 );
+		if (iC.getNp() > 0) {
+			iC.deletePerson(iC.getNp() -1 );
 		}
 	}
 	
+	@Override
+	protected boolean isCellContentValid(int row, int col, String val) {
+		MyIntegerStringConverter mIC = new MyIntegerStringConverter();
+		switch (col) {
+		
+		case 0:
+			// index column cannot be edited.  prevent pasting of data here
+			return false;
+		case 1:
+			// any text for name is valid
+			 return true;
+		case 2:
+			// Age should be an integer
+			return mIC.isNumber(val)? true: false;
+			
+		default:
+			// max columns is 2.  If trying to paste outside table, 
+			// return false
+			return false;
+		}
 
-	/*
-	 * public void initNthSpinner() { // Listen for Spinner nbrText changes
-	 * InputCommon iC = InputCommon.getInstance(); MyIntegerStringConverter miC =
-	 * new MyIntegerStringConverter(); MyFloatStringConverter mfC = new
-	 * MyFloatStringConverter();
-	 * 
-	 * nthSpinner.focusedProperty().addListener((observable,oldV, newV) -> {
-	 * 
-	 * if (!newV) { final int value = (int)nthSpinner.getValue(); if(value !=
-	 * iC.getNth()) { while (value > iC.getNth()) { iC.setNth(iC.getNth() + 1);
-	 * iC.addTh(new Thickness(iC.getNth(),0.0,0.0)); } while ( value < iC.getNth())
-	 * { iC.deleteTh(iC.getNth() -1 ); }
-	 * 
-	 * iC.setNth(value);
-	 * 
-	 * 
-	 * } else { nthSpinner.getValueFactory().setValue(iC.getNth()); } } }); }
-	 */
-	
-
+	}
 	
 	@Override
 	protected  void pasteFromClipboard( ) {
@@ -233,7 +244,7 @@ public class ThicknessTableController extends GenericTableController implements 
 		if (row < 0) 
 			return row;
 		
-		iC.addTh(row, new Thickness(row+1,0,0));
+		iC.addPerson(row, new Persons(row+1,"",0));
 		
 		return row;
 	}
@@ -248,7 +259,7 @@ public class ThicknessTableController extends GenericTableController implements 
 		if (row < 0) 
 			return row;
 		
-		iC.deleteTh(row);
+		iC.deletePerson(row);
 		
 		return row;
 	}

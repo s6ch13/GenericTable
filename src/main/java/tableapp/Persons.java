@@ -1,5 +1,5 @@
 /*
-	Thickness.java
+	Persons.java
 	
 	Copyright (C) 2019  Sriram C.
 
@@ -19,24 +19,17 @@
 
 package tableapp;
 
-public class Thickness {
+public class Persons {
 	
 	private Integer index;
-	private float thv;
-	private float xth;
+	private String name;
+	private Integer age;
 
-	public Thickness(Integer index, float thv, float xth) {
+	public Persons(Integer index, String name, Integer age) {
 		super();
 		this.index = index;
-		this.thv = thv;
-		this.xth = xth;
-	}
-
-	public Thickness(Integer index, double thv, double xth) { 
-		super();
-		this.index = index;
-		this.thv = (float)thv;
-		this.xth = (float)xth;
+		this.name = name;
+		this.age = age;
 	}
 	
 	
@@ -48,20 +41,20 @@ public class Thickness {
 		this.index = index;
 	}
 
-	public float getthv() {
-		return thv;
+	public String getName() {
+		return name;
 	}
 
-	public void setbrv(float thv) {
-		this.thv = thv;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public float getxth() {
-		return xth;
+	public Integer getAge() {
+		return age;
 	}
 
-	public void setxth(float xth) {
-		this.xth = xth;
+	public void setAge(Integer age) {
+		this.age = age;
 	}
 
 }

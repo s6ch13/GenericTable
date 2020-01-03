@@ -18,31 +18,16 @@
 */
 package tableapp;
 
-import java.awt.Desktop;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import tableapp.InputCommon;
-import tableapp.MainApp;
-
 import com.gems.table.TableEventObject;
-import com.jfoenix.controls.JFXTabPane;
 
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.text.TextAlignment;
 
 
 public class RootPaneController implements Initializable {
@@ -64,7 +49,7 @@ public class RootPaneController implements Initializable {
 	private MenuItem MenuDelete;
 	
 
-	@FXML private AnchorPane ThicknessTableHolder;
+	@FXML private AnchorPane PersonTableHolder;
 
 
 

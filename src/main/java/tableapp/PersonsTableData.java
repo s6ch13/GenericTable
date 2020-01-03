@@ -21,26 +21,27 @@ package tableapp;
 
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 
-public class ThicknessTableData {
+public class PersonsTableData {
 
 	private SimpleIntegerProperty index;
-	private SimpleFloatProperty thv;
-	private SimpleFloatProperty xth;
+	private SimpleStringProperty name;
+	private SimpleIntegerProperty age;
 
 
-	public ThicknessTableData(Thickness thp) {
-		this.index = new SimpleIntegerProperty(thp.getIndex());
-		this.thv = new SimpleFloatProperty(thp.getthv());
-		this.xth = new SimpleFloatProperty(thp.getxth());
+	public PersonsTableData(Persons pp) {
+		this.index = new SimpleIntegerProperty(pp.getIndex());
+		this.name = new SimpleStringProperty(pp.getName());
+		this.age = new SimpleIntegerProperty(pp.getAge());
 	}
 
-	public ThicknessTableData(final Integer index, final float thv,
-			final float xth) {
+	public PersonsTableData(final Integer index, final String name,
+			final Integer age) {
 		this.index = new SimpleIntegerProperty(index);
-		this.thv = new SimpleFloatProperty(thv);
-		this.xth = new SimpleFloatProperty(xth);
+		this.name = new SimpleStringProperty(name);
+		this.age = new SimpleIntegerProperty(age);
 	}
 
 	public Integer getIndex() {
@@ -51,19 +52,20 @@ public class ThicknessTableData {
 		this.index.set(index);
 	}
 
-	public float getThv() {
-		return thv.get();
+	public String getName() {
+		return name.get();
 	}
 
-	public void setThv(final float thv) {
-		this.thv.set(thv);
+	public void setName(final String name) {
+		this.name.set(name);
 	}
-	public float getXth() {
-		return xth.get();
+	
+	public Integer getAge() {
+		return age.get();
 	}
 
-	public void setXth(final float xth) {
-		this.xth.set(xth);
+	public void setAge(final Integer age) {
+		this.age.set(age);
 	}	
 	
 	public String getCol(int col) {
@@ -74,10 +76,10 @@ public class ThicknessTableData {
 			ret = Integer.toString(index.get());
 			break;
 		case 1:
-			ret = Float.toString(thv.get());
+			ret = name.get();
 			break;
 		case 2:
-			ret = Float.toString(xth.get());
+			ret = Integer.toString(age.get());
 			break;			
 		}
 		return ret;
@@ -89,16 +91,16 @@ public class ThicknessTableData {
 			setIndex(Integer.valueOf(val));
 			break;
 		case 1:
-			setThv(Float.valueOf(val));
+			setName(val);
 			break;
 		case 2:
-			setXth(Float.valueOf(val));
+			setAge(Integer.valueOf(val));
 			break;
 		}
 	}
 	
 	public void printThPoint() {
-		System.out.println(getIndex()+"\t"+getThv()+"\t"+getXth());
+		System.out.println(getIndex()+"\t"+getName()+"\t"+getAge());
 		
 	}
 	
