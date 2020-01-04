@@ -4,32 +4,24 @@ plugins {
   	id 'application'
   	id 'eclipse'
   	
-  	id 'org.openjfx.javafxplugin' version '0.0.5' 
-    //id "org.kordamp.gradle.jdeps" version "0.5.0" 
+    id 'org.openjfx.javafxplugin' version '0.0.5' apply false
 }
-ext.jdkver = 11
-    apply plugin: 'java'
-	apply plugin: 'eclipse'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+ext.jdkver = 11	
+ext.jarName = "tableApp.jar"	
 	
 project.version = '1.0.4.0'
 
-	repositories {
-	    // Use 'jcenter' for resolving your dependencies.
-	    // You can declare any Maven/Ivy/file repository here.
-	    mavenLocal()
-	    jcenter()
-	    //mavenCentral()
-	    
-//	    maven {
-//            url "https://plugins.gradle.org/m2/"
-//        }
-	    
-	}	
+repositories {
+   // Use 'jcenter' for resolving your dependencies.
+   // You can declare any Maven/Ivy/file repository here.
+	mavenLocal()
+	jcenter()
+}	
 	 
-    javafx {
-        modules = [ 'javafx.controls','javafx.fxml', 'javafx.web', 'javafx.swing' ]
-        version = "11.0.2"
-        }
 	
 sourceSets {
         main {
@@ -51,9 +43,15 @@ if (jdkver >= 11) {
 	apply plugin:  'org.openjfx.javafxplugin' 
  
     javafx {
-    	modules = [ 'javafx.controls','javafx.fxml', 'javafx.web', 'javafx.swing' ]
+    	modules = [ 'javafx.controls','javafx.fxml']
     	version = "11.0.2"
 	}
+}
+
+compileJava {
+	sourceCompatibility = jdkver
+    targetCompatibility = jdkver
+    options.fork = true
 }
 
 // Dependencies
@@ -70,27 +68,28 @@ dependencies {
 }
 
 
-dependencies {
-
-    // controlsfx & jfoenix         
-    if (jdkver == 1.8) { 
-        compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
-    } else if (jdkver >= 11) { 
-	    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
-    }
-	compile 'commons-lang:commons-lang:2.6'
-}
-
 mainClassName = 'tableapp.Main'
 
+
+task copyJars (type: Copy) {
+    def fromDir = "build/libs/"
+	def toDir = "./"
+	include jarName
+ 
+    // copy jars to lib folder:
+    from fromDir
+    into toDir
+}
  
 tasks.withType(JavaCompile) {
     options.warnings = false
 }
 
+build.dependsOn copyJars
+
 jar {
 
-    archiveName = "tableapp.jar"
+    archiveName = jarName
 
     from {
 
@@ -103,16 +102,10 @@ jar {
        }
      }
     
-//    from processResources              
-//    into('lib') {
- //       from configurations.runtime
- //   }
 
      manifest {
         attributes (
         'Main-Class': 'tableapp.Main',
-         // add classpath to Manifest; see http://stackoverflow.com/questions/30087427/add-classpath-in-manifest-file-of-jar-in-gradle
-         //"Class-Path": '. lib/' + configurations.default.collect { it.getName() }.join(' lib/')
         )
         
      }

@@ -1,20 +1,28 @@
 /*
-	MainApp.java
+	TableApp.java
 	
 	Copyright (C) 2019  Sriram C.
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+	
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+	ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 package tableapp;
@@ -30,7 +38,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
-public class MainApp extends Application {
+public class TableApp extends Application {
 
 	private Stage primaryStage;
     private BorderPane rootLayout;
@@ -66,7 +74,7 @@ public class MainApp extends Application {
             FXMLLoader loader = new FXMLLoader();
             Locale locale = new Locale("en", "IN");
 
-            loader.setLocation(MainApp.class.getResource(fxmlDocPath));
+            loader.setLocation(TableApp.class.getResource(fxmlDocPath));
             
             this.primaryStage.setTitle("Table App demo");
 
@@ -105,9 +113,9 @@ public class MainApp extends Application {
 		
 		// Lets setup 3 names in this example to start.
 		// Row number starts at 0 while index starts with 1
-		iC.addPerson(0,new Persons(1,"Mary",23));
-		iC.addPerson(1,new Persons(2,"John",31));
-		iC.addPerson(2,new Persons(3,"Alex",53));
+		iC.addPerson(0,new Person(1,"Mary",23));
+		iC.addPerson(1,new Person(2,"John",31));
+		iC.addPerson(2,new Person(3,"Alex",53));
 	}
 	
 	public void exit() {

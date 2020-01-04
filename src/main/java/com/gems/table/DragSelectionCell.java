@@ -2,18 +2,26 @@
 	DragSelectionCell.java
     Copyright (C) 2019  Sriram C.
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+	
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+	ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 package com.gems.table;
@@ -68,10 +76,8 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
         int endCol = list.indexOf(getTableColumn());
 		int endRow = getIndex();
 
-        System.out.println("On Drag Detected " +endRow + " " + endCol);
+        // System.out.println("On Drag Detected " +endRow + " " + endCol);
         
-        // Clear old rectangle
-        // FIXME - only the rectangle selection should be cleared and not the previous selection
 		getTableColumn().getTableView().getSelectionModel().clearSelection();	
 		
 		// is the below two lines needed
@@ -101,8 +107,6 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 	                startCol = columnList.indexOf(getTableColumn());
 	                startRow = getIndex();
 	                
-	                System.out.println("On Drag Entered " +startRow + " " + startCol);
-
 	            }  
 	        });  
 	       
@@ -110,7 +114,7 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 
 	            @Override  
 	            public void handle(MouseDragEvent event) {  
-	                System.out.println("On Drag Entered " +getIndex() + " " + getTableColumn());
+	                // System.out.println("On Drag Entered " +getIndex() + " " + getTableColumn());
 	                
 	                selectRectangle();
 
@@ -123,7 +127,7 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 	            @Override  
 	            public void handle(MouseDragEvent event) {  
 	                //getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());  
-	                System.out.println("On Drag exited " +getIndex() + " " + getTableColumn());
+	                // System.out.println("On Drag exited " +getIndex() + " " + getTableColumn());
 
 	            }  
 	            

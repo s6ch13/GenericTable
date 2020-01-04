@@ -1,6 +1,5 @@
-package tableapp;
 /*
-	Main.java
+	Person.java
 	
 	Copyright (C) 2019  Sriram C.
 
@@ -23,15 +22,47 @@ package tableapp;
 	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 */
 
-public class Main {
+package tableapp;
 
+public class Person {
+	
+	private Integer index;
+	private String name;
+	private Integer age;
 
-	public static void main(java.lang.String[] args) {
-		TableApp.main(args);
+	public Person(Integer index, String name, Integer age) {
+		super();
+		this.index = index;
+		this.name = name;
+		this.age = age;
+	}
+	
+	
+	public Integer getIndex() {
+		return index;
+	}
 
+	public void setIndex(Integer index) {
+		this.index = index;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
 	}
 
 }
-

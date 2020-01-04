@@ -1,7 +1,11 @@
 /*
-	EditCell.java
-
-*/
+ *	EditCell.java
+ *
+ * Reference:
+ * Some portions of the code for edit cells was initially developed by DanNewton and enhanced
+ * https://dzone.com/articles/editable-tables-in-javafx
+ * 
+ */
 
 package com.gems.table;
 
@@ -16,7 +20,6 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
@@ -124,7 +127,6 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("hi");
 			}
 		});
 

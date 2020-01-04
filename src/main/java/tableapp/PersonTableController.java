@@ -1,21 +1,34 @@
 /*
-	PersonsTableController.java
+	PersonTableController.java
 	
 	Copyright (C) 2019  Sriram C.
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+	
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+	ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+/* Reference:
+ * Some portions of the code was initially developed by DanNewton and enhanced
+ * https://dzone.com/articles/editable-tables-in-javafx
+ */
 
 package tableapp;
 
@@ -40,10 +53,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
-public class PersonsTableController extends GenericTableController implements Initializable{
+public class PersonTableController extends GenericTableController implements Initializable{
 
 	// Reference to the main application.
-    private MainApp mainApp;
+    private TableApp tableApp;
     private ResourceBundle bundle;
 
     @FXML public Button addRow;
@@ -52,16 +65,16 @@ public class PersonsTableController extends GenericTableController implements In
 
     
 	@FXML
-	protected TableView<PersonsTableData> table;
+	protected TableView<PersonTableData> table;
 
 	@FXML
-	private TableColumn<PersonsTableData, Integer> indexColumn;
+	private TableColumn<PersonTableData, Integer> indexColumn;
 
 	@FXML
-	private TableColumn<PersonsTableData, String> nameColumn;
+	private TableColumn<PersonTableData, String> nameColumn;
 
 	@FXML
-	private TableColumn<PersonsTableData, Integer> ageColumn;
+	private TableColumn<PersonTableData, Integer> ageColumn;
 	
 	
 	@Override
@@ -99,7 +112,6 @@ public class PersonsTableController extends GenericTableController implements In
 	
 	@Override	
 	public void setValue(int row,int col,String val) {
-		System.out.println("set value - persons controller");
 
 		InputCommon iC = InputCommon.getInstance();
 		iC.setPersonData(row,col,val);
@@ -115,7 +127,7 @@ public class PersonsTableController extends GenericTableController implements In
 	private void setupindexColumn() {
 		
 		indexColumn.setCellFactory(
-				DragSelectionCell.<PersonsTableData, Integer>forTableColumn(
+				DragSelectionCell.<PersonTableData, Integer>forTableColumn(
 						new MyIntegerStringConverter()));
 		indexColumn.setEditable(false);
 		indexColumn.setSortable(false);
@@ -123,7 +135,7 @@ public class PersonsTableController extends GenericTableController implements In
 
 	private void setupNameColumn() {
 		nameColumn.setCellFactory(
-				EditCell.<PersonsTableData, String>forTableColumn(
+				EditCell.<PersonTableData, String>forTableColumn(
 						new StringConverter<String>() {
 							@Override
 							public String toString(String s) {
@@ -159,9 +171,9 @@ public class PersonsTableController extends GenericTableController implements In
 
 	private void setupAgeColumn() {			
 		ageColumn.setCellFactory(
-				EditCell.<PersonsTableData, Integer>forTableColumn(
+				EditCell.<PersonTableData, Integer>forTableColumn(
 						new MyIntegerStringConverter()));
-		// updates the xth field on the ThicknessTableData object to the
+		// updates the age field on the PersonTableData object to the
 		// committed value
 		ageColumn.setOnEditCommit(event -> {			
 			// Validate the input before committing
@@ -188,7 +200,7 @@ public class PersonsTableController extends GenericTableController implements In
 		InputCommon iC = InputCommon.getInstance();
 
 		iC.setNp(iC.getNp() + 1);
-		iC.addPerson(new Persons(iC.getNp(),"",0));		
+		iC.addPerson(new Person(iC.getNp(),"",0));		
 	}
 
 	@FXML
@@ -239,12 +251,11 @@ public class PersonsTableController extends GenericTableController implements In
 		InputCommon iC = InputCommon.getInstance();					
 
 		int row = super.insertRowAbove();
-		System.out.println("insert row above - th table, rownum=" + row);
 
 		if (row < 0) 
 			return row;
 		
-		iC.addPerson(row, new Persons(row+1,"",0));
+		iC.addPerson(row, new Person(row+1,"",0));
 		
 		return row;
 	}
@@ -253,7 +264,6 @@ public class PersonsTableController extends GenericTableController implements In
 	protected int deleteRow() { 
 		InputCommon iC = InputCommon.getInstance();					
 
-		System.out.println("delete row - th table");
 		int row = super.deleteRow();
 		
 		if (row < 0) 
@@ -268,10 +278,10 @@ public class PersonsTableController extends GenericTableController implements In
 	/**
      * Is called by the main application to give a reference back to itself.
      * 
-     * @param mainApp
+     * @param tableApp
      */
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
+    public void setMainApp(TableApp tableApp) {
+        this.tableApp = tableApp;
     }
 
 }
