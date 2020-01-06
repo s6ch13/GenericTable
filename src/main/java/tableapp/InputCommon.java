@@ -34,7 +34,7 @@ import javafx.collections.ObservableList;
 
 public class InputCommon {
 
-	private static InputCommon inputCommon = new InputCommon();
+	private final static InputCommon inputCommon = new InputCommon();
 
 	// Singleton initialization
 	private InputCommon() {
@@ -44,8 +44,8 @@ public class InputCommon {
 		return inputCommon;
 	}
 
-	static int np; // number of Person in table
-	static ObservableList<PersonTableData> personData = FXCollections.observableArrayList();
+	int np; // number of Person in table
+	ObservableList<PersonTableData> personData = FXCollections.observableArrayList();
 
 	
 	public void init() {
@@ -53,11 +53,11 @@ public class InputCommon {
 	}
 
 	public void setNp(int np) {
-		InputCommon.np = np;
+		this.np = np;
 	}
 
 	public int getNp() {
-		return InputCommon.np;
+		return this.np;
 	}
 
 	public List<Person> initPersonData() {
@@ -105,7 +105,7 @@ public class InputCommon {
 
 	
 	public ObservableList<PersonTableData> getPersonData() {
-		return InputCommon.personData;
+		return this.personData;
 	}
 
 
@@ -113,7 +113,7 @@ public class InputCommon {
 	public void setPersonData(int row, int col, String val) {
 		PersonTableData ptd = personData.get(row);
 		ptd.updateCol(col, val);
-		InputCommon.personData.set(row, ptd);
+		this.personData.set(row, ptd);
 	}
 
 	
@@ -163,7 +163,7 @@ public class InputCommon {
 		System.out.println("------");
 		
 
-		System.out.println("Number of Person=" + InputCommon.np );
+		System.out.println("Number of Person=" + this.np );
 		System.out.println("Person:");
 		for (int i = 0; i < personData.size(); i++) {
 			personData.get(i).printPersonPoint();
