@@ -12,6 +12,7 @@ The goal of this project is to bring some of the basic excel like capabilities t
 
 ## Structure : 
 '''
+
 src/main/java ->com.gems.table - contains the generic table library
 
               ->tableapp       - example app that uses the generic library 
@@ -22,6 +23,7 @@ src/main/java ->com.gems.table - contains the generic table library
 Settings.gradle
 
 build.gradle
+
 '''
 
 ## Building
