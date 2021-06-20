@@ -1,6 +1,6 @@
 # JavaFX Generic Table Library
 
-The goal of this project is to bring some of the basic excel like capabilities to javafx tables.  
+The goal of this project is to bring some of the basic excel like capabilities to javafx tables.  This work is an offshoot of the development work at https://www.gemsoftware.org  Geotechnical Engineering Modelling Software (GEMS)
 
 ## Supports : 
 1) Editing of cells in tableview
