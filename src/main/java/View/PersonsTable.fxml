@@ -45,15 +45,19 @@
 			<VBox alignment="TOP_RIGHT" prefHeight="265.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 				<children>
 					<HBox alignment="CENTER_RIGHT" prefHeight="45.0">
-						<children>
+					  <children>
+					    
+					    <Button fx:id="addRow" onAction="#addRowBelow" id="plus-button"
+						    alignment="CENTER" contentDisplay="GRAPHIC_ONLY">
+					      <HBox.margin>
+						<Insets right="5.0" />
+					      </HBox.margin>
+					    </Button>
 
-							<Button fx:id="addRow" onAction="#addRowBelow" text="Add row" textAlignment="CENTER">
-                        <HBox.margin>
-                           <Insets right="5.0" />
-                        </HBox.margin></Button>
-							<Button fx:id="delRow" onAction="#delLastRow" text="Del row" textAlignment="CENTER">
-							</Button>
-						</children>
+					    <Button fx:id="delRow" onAction="#delLastRow" id="minus-button"
+						    alignment="CENTER" contentDisplay="GRAPHIC_ONLY"/>
+
+					  </children>
 					</HBox>
 
 					<TableView fx:id="table" prefHeight="200.0" prefWidth="270">

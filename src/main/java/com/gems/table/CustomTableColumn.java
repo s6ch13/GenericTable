@@ -1,6 +1,6 @@
 /*
 	CustomTableColumn.java
-    Copyright (C) 2019  Sriram C.
+	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+*/ 
 
 package com.gems.table;
 
@@ -35,7 +35,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 
 public class CustomTableColumn<S,T> extends TableColumn<S,T> {
-    String headerString;
+    private String headerText;
 	Label label;
     StackPane stack;
 
@@ -45,13 +45,13 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 		label = new Label();
 		stack = new StackPane();
 		
-		headerString = new String(getText());
+		headerText = new String(getText());
 		customHeader();
 	}
 	
 	public CustomTableColumn(String s) {
 		super(s);
-		headerString = new String(s);
+		headerText = new String(s.trim());
 
 		label = new Label();
 		stack = new StackPane();
@@ -62,12 +62,12 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 	
 	public void customHeader() {
 	    //label.setStyle("-fx-padding: 8px;");
-		label.setText(headerString);
+		label.setText(headerText);
 	    label.setWrapText(true);
-	    label.setAlignment(Pos.CENTER);
-	    label.setTextAlignment(TextAlignment.CENTER);
+	    label.setAlignment(Pos.CENTER_RIGHT);
+	    label.setTextAlignment(TextAlignment.RIGHT);
 	    label.setContentDisplay(ContentDisplay.RIGHT);
-	    label.setGraphicTextGap(4);
+	    label.setGraphicTextGap(2);
 	    
 	    if (stack.getChildren() !=null) {
 	    	stack.getChildren().remove(label);
@@ -80,12 +80,12 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 	}
 	
 	public void setHeaderText(String s) {
-		headerString = s;
+		this.headerText = s.trim();
 		customHeader();
 	}
 
-	public String getHeaderString() {
-		return headerString;
+	public String getHeaderText() {
+		return this.headerText;
 	}
 	
 	public void setHeaderGraphic(Node n) {
@@ -95,5 +95,21 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 	public Node getHeaderGraphic() {
 		return(label.getGraphic());
 	}
+	
+	public void setHeaderAlignment(Pos p) { 
+		label.setAlignment(p);
+	}
+	
+	public void setHeaderAlignment(String p) { 
+		setHeaderAlignment(Pos.valueOf(p));
+	}	
+
+	public void setTextAlignment(TextAlignment tA) { 
+		label.setTextAlignment(tA);
+	}
+	
+	public void setTextAlignment(String tA) { 
+		label.setTextAlignment(TextAlignment.valueOf(tA));
+	}	
 	
 }

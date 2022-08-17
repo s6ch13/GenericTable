@@ -1,17 +1,20 @@
 // Common Build file for Generic Table 
 
 plugins {
-  	id 'application'
+	id 'application'
   	id 'eclipse'
   	
-    id 'org.openjfx.javafxplugin' version '0.0.5' apply false
+    	id 'org.openjfx.javafxplugin' version '0.0.10' apply false
+	//https://github.com/johnrengelman/shadow
+	// for creating fat jar.
+	id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-ext.jdkver = 11	
-ext.jarName = "tableApp.jar"	
+ext.jdkver = 17
+ext.jarName = "tableApp"	
 	
 project.version = '1.0.4.0'
 
@@ -37,14 +40,21 @@ sourceSets {
         }
 }
 
+if (jdkver == 11) {
+    apply plugin:  'org.openjfx.javafxplugin' 
+	javafx {
+    	modules = [ 'javafx.controls','javafx.fxml' ]
 
-if (jdkver >= 11) { 
- 
-	apply plugin:  'org.openjfx.javafxplugin' 
- 
-    javafx {
-    	modules = [ 'javafx.controls','javafx.fxml']
     	version = "11.0.2"
+	}
+}
+
+if (jdkver == 17) {
+    apply plugin:  'org.openjfx.javafxplugin' 
+	javafx {
+    	modules = [ 'javafx.controls','javafx.fxml' ]
+
+    	version = "17.0.2"
 	}
 }
 
@@ -58,13 +68,11 @@ compileJava {
 dependencies {
     // controlsfx & jfoenix         
     if (jdkver == 1.8) { 
-        compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
-    	compile 'com.jfoenix:jfoenix:8.0.2' // Java 8    
+        implementation group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
     } else if (jdkver >= 11) { 
-	    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
-	    compile 'com.jfoenix:jfoenix:9.0.9' // Java 9 and above
+	    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.1'
     }
-     compile 'commons-lang:commons-lang:2.6'   
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
 
 
@@ -91,18 +99,6 @@ jar {
 
     archiveName = jarName
 
-    from {
-
-      configurations.runtime.collect {
-            it.isDirectory() ? it : zipTree(it)
-       }
-
-      configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-       }
-     }
-    
-
      manifest {
         attributes (
         'Main-Class': 'tableapp.Main',
@@ -113,3 +109,21 @@ jar {
    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
+shadowJar {
+   	archiveBaseName.set(jarName)
+   	archiveClassifier.set('')
+   	archiveVersion.set('')
+ 	exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA','META-INF/LICENSE*','META-INF/NOTICE*'	
+}
+
+// copy the final jar file into the root directory
+task copyJar(type: Copy) {
+	dependsOn(shadowJar)
+    from shadowJar // here it automatically reads jar file produced from jar task
+    def toDir = project.projectDir
+    
+    into toDir
+}
+
+build.dependsOn copyJar
+assemble.dependsOn copyJar

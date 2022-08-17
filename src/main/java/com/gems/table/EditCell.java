@@ -1,10 +1,9 @@
 /*
  *	EditCell.java
  *
- * Reference:
- * Some portions of the code for edit cells was initially developed by DanNewton and enhanced
- * https://dzone.com/articles/editable-tables-in-javafx
- * 
+ *  Reference:
+ *  Some portions of the code for edit cells was initially developed by DanNewton and enhanced
+ *  https://dzone.com/articles/editable-tables-in-javafx
  */
 
 package com.gems.table;

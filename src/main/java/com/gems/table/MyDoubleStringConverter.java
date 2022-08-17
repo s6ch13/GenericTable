@@ -1,6 +1,5 @@
 /*
 	MyDoubleStringConverter.java
-	
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -23,12 +22,13 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+*/ 
 
 /* Reference:
  * Some portions of the code was initially developed by DanNewton and enhanced
  * https://dzone.com/articles/editable-tables-in-javafx
  */
+
 
 package com.gems.table;
 
@@ -36,8 +36,7 @@ import javafx.util.converter.DoubleStringConverter;
 
 public class MyDoubleStringConverter extends DoubleStringConverter {
 
-	public String format = "%.4f";
-	
+	private String format = "%.4f";
 
 	public MyDoubleStringConverter() { 
 		super();	
@@ -50,8 +49,8 @@ public class MyDoubleStringConverter extends DoubleStringConverter {
 	
 	@Override
 	public Double fromString(final String value) {
-		if (value.isEmpty()) {
-			return (double)0;
+		if (value.trim().isEmpty()) {
+			return Double.valueOf(0.0);
 		}
 		return isNumber(value) ? super.fromString(value)
 				:Double.NaN;
@@ -71,6 +70,8 @@ public class MyDoubleStringConverter extends DoubleStringConverter {
 	}
 
 	public boolean isNumber(String value) {
+		value = value.trim();
+
 		int size = value.length();
 		boolean decimalPt = false;  // occurrence of decimal pt
 		
@@ -132,7 +133,5 @@ public class MyDoubleStringConverter extends DoubleStringConverter {
 		}
 		
 		return true;
-
-	}
-	
+	}	
 }

@@ -1,5 +1,5 @@
 /*
-	MyIntegerStringConverter.java
+	package-info.java
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -24,53 +24,4 @@
 
 */ 
 
-/* Reference:
- * Some portions of the code was initially developed by DanNewton and enhanced
- * https://dzone.com/articles/editable-tables-in-javafx
- */
-
-
 package com.gems.table;
-
-import javafx.util.converter.IntegerStringConverter;
-
-public class MyIntegerStringConverter extends IntegerStringConverter {
-
-	@Override
-	public Integer fromString(final String value) {
-		if (value.trim().isEmpty()) {
-			return Integer.valueOf(0);
-		}
-		return isNumber(value) ? super.fromString(value.trim())
-				: null;
-	}
-
-	
-	// FIXME - should also accept numbers like 1.0, 10.0 
-	public boolean isNumber(String value) {
-		value = value.trim();
-		int size = value.length();
-		for (int i = 0; i < size; i++) {
-			
-			if(value.charAt(i) == '-' && i >0) {
-				return false;
-			}
-			
-			if(value.charAt(i) == '+' && i >0) {
-				return false;
-			}			
-			
-			// when pasting from excel, the last char is /r.  
-			// other valid digits are  0-9 + -
-			
-			if (!(Character.isDigit(value.charAt(i)) ||
-					(i == (size-1) && value.charAt(i) == '\r' ) || 
-					value.charAt(i) == '-' ||
-					value.charAt(i) == '+' ) ) {
-				return false;
-			}
-			
-		}
-		return true;
-	}
-}

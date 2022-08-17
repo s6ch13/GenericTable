@@ -27,31 +27,20 @@
 
 #pane, 
 .root {
-	-fx-border-color: #83AEF2;	
+    -fx-border-color: #83AEF2;	
 	
-	    -fx-accent:  #5d93ea;
-	
-
+    -fx-accent:  #5d93ea;
 }
 
-
-.label {
-}
-
-.label-bright {
-}
-
-.label-header {
-}
 
 .table-view {
-	-fx-border-radius: 5 5 5 5;
-  -fx-background-radius: 5 5 5 5;
-  	-fx-border-color: transparent
+    -fx-border-radius: 5 5 5 5;
+    -fx-background-radius: 5 5 5 5;
+    -fx-border-color: transparent
 }
 
 .scroll-pane { 
-	-fx-background-color: transparent
+    -fx-background-color: transparent
 }
 
 .table-view .column-header .label {
@@ -60,9 +49,9 @@
 }
 
 .table-column {
-  -fx-alignment: CENTER_RIGHT;
-  	-fx-border-radius: 5 5 5 5;
-  -fx-background-radius: 5 5 5 5;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-border-radius: 5 5 5 5;
+    -fx-background-radius: 5 5 5 5;
 }
 
 .table-view:focused .table-row-cell:filled:focused:selected {
@@ -77,50 +66,36 @@
   order. */
  }
 
-
-.jfx-button {
-     -jfx-button-type: RAISED;
-     -fx-background-color: #83AEF2;
-     -fx-text-fill: white;
-}
-
-
-#custom-titled-pane{
-	-fx-border-radius: 5 5 5 5;
-	-fx-border-insets: 8 0 0 0 ;
-	-fx-border-color: grey
-}
-
-#custom-titled-pane-label{
-	-fx-border-radius: 5 5 5 5;
-	-fx-padding: 0 5; 
-	-fx-border-color: grey; 
-	-fx-background-color: #FFFFFF;
-}
-
-
-#folder-button {
-    -fx-background-image: url(../Resources/Images/folder.png);
+#plus-button { 
+    -fx-background-image: url(../Resources/Images/plus_button_blue_24.png);
     -fx-background-color: transparent;
-    
-    -fx-background-size: 32px 26px;
+    -fx-background-size: 18px 18px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
-#legend_label{
-	-fx-border-color: transparent;	
-   -fx-background-color:  transparent;
-   -fx-font-size: 10px;
-   -fx-text-alignment:left;
-   -fx-hpos:left;
-   
+#plus-button:pressed { 
+    -fx-background-image: url(../Resources/Images/plus_button_blue_pressed_24.png);
+    -fx-background-color: transparent;
+    -fx-background-size: 18px 18px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
 }
 
-#chart_background_rotate { 
-    -fx-padding: 10px;
-    -fx-background-image: url("../Resources/Images/FullWatermarkRotate.png");
-    -fx-background-position: right top;
-    -fx-background-repeat: no-repeat, no-repeat;
-    -fx-background-size:15, 164;	
+#minus-button { 
+    -fx-background-image: url(../Resources/Images/minus_button_blue_24.png);
+    -fx-background-color: transparent;
+    -fx-background-size: 18px 18px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
 }
+
+#minus-button:pressed { 
+    -fx-background-image: url(../Resources/Images/minus_button_blue_pressed_24.png);
+    -fx-background-color: transparent;
+    -fx-background-size: 18px 18px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+

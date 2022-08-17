@@ -1,6 +1,5 @@
 /*
 	MyFloatStringConverter.java
-	
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -23,12 +22,13 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+*/ 
 
 /* Reference:
  * Some portions of the code was initially developed by DanNewton and enhanced
  * https://dzone.com/articles/editable-tables-in-javafx
  */
+
 
 package com.gems.table;
 
@@ -36,7 +36,7 @@ import javafx.util.converter.FloatStringConverter;
 
 public class MyFloatStringConverter extends FloatStringConverter {
 
-	public String format = "%.4f";
+	private String format = "%.4f";
 
 	public MyFloatStringConverter() { 
 		super();
@@ -49,8 +49,8 @@ public class MyFloatStringConverter extends FloatStringConverter {
 	
 	@Override
 	public Float fromString(final String value) {
-		if (value.isEmpty()) {
-			return (float)0;
+		if (value.trim().isEmpty()) {
+			return Float.valueOf(0);
 		}
 		return isNumber(value) ? super.fromString(value)
 				: Float.NaN;
@@ -70,6 +70,8 @@ public class MyFloatStringConverter extends FloatStringConverter {
 	}
 	
 	public boolean isNumber(String value) {
+		value = value.trim();
+
 		int size = value.length();
 		boolean decimalPt = false;  // occurrence of decimal pt
 		
@@ -126,12 +128,9 @@ public class MyFloatStringConverter extends FloatStringConverter {
 
 			if(value.charAt(i) == '+' &&  (i != 0  && i != epos+1))  {
 				return false;
-			}
-			
+			}			
 		}
 		
 		return true;
-
 	}
-
 }

@@ -1,6 +1,5 @@
 /*
 	TableEventObject.java
-	
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -23,10 +22,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
-/*  Some portions of code has been borrowed and modified from 
- *  https://www.javaworld.com/article/2077333/core-java/mr-happy-object-teaches-custom-events.html
- */
+*/ 
 
 package com.gems.table;
 
@@ -48,7 +44,7 @@ public class TableEventObject {
 	
 	private TableEventType _tet;
 	private Object _teo;
-    private List _listeners = new ArrayList();
+    private List<TableEventListener> _listeners = new ArrayList<TableEventListener>();
 
     
     public synchronized void copy() {
@@ -102,7 +98,7 @@ public class TableEventObject {
     
     private synchronized void _fireAppEvent() {
         TableEvent tet = new TableEvent( this, _tet,_teo );
-        Iterator listeners = _listeners.iterator();
+        Iterator<TableEventListener> listeners = _listeners.iterator();
         while( listeners.hasNext() ) {
             ( (TableEventListener) listeners.next() ).tableEventReceived( tet );
         }

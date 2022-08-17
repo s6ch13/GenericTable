@@ -8,7 +8,6 @@ package com.gems.table;
 
 import java.util.EventObject;
 
-
 public class TableEvent extends EventObject {
 
 	private TableEventType tet;
@@ -32,5 +31,4 @@ public class TableEvent extends EventObject {
 	public Object tableEventObject() {
 		return teo;
 	}
-
 }

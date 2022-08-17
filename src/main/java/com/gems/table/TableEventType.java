@@ -1,6 +1,5 @@
 /*
 	TableEventType.java
-	
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -23,11 +22,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
-
-/*  This portion of code has been borrowed and modified from 
- *  https://www.javaworld.com/article/2077333/core-java/mr-happy-object-teaches-custom-events.html
- */
+*/ 
 
 package com.gems.table;
 

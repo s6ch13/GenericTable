@@ -1,6 +1,6 @@
 /*
 	GenericTableController.java
-    Copyright (C) 2019  Sriram C.
+	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,14 @@
  * https://stackoverflow.com/questions/31708840/save-table-in-clipboad-javafx
  */
 
+
 package com.gems.table;
 
+import java.util.List;
+import java.util.StringTokenizer;
+
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -54,34 +59,21 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
-
-import java.util.List;
-import java.util.StringTokenizer;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.event.ActionEvent;
 
 
-
-public class GenericTableController<S> implements TableEventListener{
+public abstract class GenericTableController<S> implements TableEventListener{
 
 	public TableView<S> table;
 	protected ScrollPane tableScrollPane;
 	protected boolean tableSelected = false; // variable to track if this table is under focus
 
-	
 	// create context Menu
 	protected ContextMenu contextMenu;
-	
-	protected MenuItem copyMenuItem;
-	protected MenuItem pasteMenuItem;
-	protected MenuItem cutMenuItem;
-	protected MenuItem deleteMenuItem;
-	protected MenuItem selectAllMenuItem;
-	
-	protected MenuItem insertRowAboveMenuItem;
-	protected MenuItem deleteRowMenuItem;
+	protected MenuItem copyMenuItem, pasteMenuItem, cutMenuItem, deleteMenuItem, selectAllMenuItem;
+	protected MenuItem insertRowAboveMenuItem, deleteRowMenuItem;
 	
 	public void init() {
 		
@@ -105,7 +97,7 @@ public class GenericTableController<S> implements TableEventListener{
 	public void clearTableSelection(String id) {
 		// return if we receive our own event or if we werent the last selected table
 		if (table.getId() == id || tableSelected==false) return;
-		// System.out.println("old selection " + table.getId());
+
 		tableSelected = false;
 		table.getSelectionModel().clearSelection();
 	}
@@ -115,8 +107,7 @@ public class GenericTableController<S> implements TableEventListener{
 		table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 		    if (newSelection != null) {
 		    	if ( tableSelected == false) {
-		    	// focus has entered this table
-		   // 		System.out.println("current table focus  "+ table.getId());
+		    		// focus has entered this table
 		    		// Send an event to let other tables know that this table has gained focus
 		    		// this way the other tables can clear their selections
 		    		TableEventObject.getInstance().tableFocusChanged(table.getId());
@@ -127,19 +118,15 @@ public class GenericTableController<S> implements TableEventListener{
 
 	}
 	
-	public String getValue(int row,int col) {
-		 return new String("parent not valid");
-	}
+	public abstract String getValue(int row,int col);
 	
-	public void setValue(int row,int col,String val) {
-
-	}
+	public abstract void setValue(int row,int col,String val);
 	
 	protected boolean isCellContentValid(int row,int col,String clipboardCellContent) {
 		return true;
 	}
 	
-	public void clearValue(int row,int col) {}
+	public abstract void clearValue(int row,int col);
 	
 	protected void updateColumnHeaders() {}
 	
@@ -188,8 +175,7 @@ public class GenericTableController<S> implements TableEventListener{
 	// Create a context menu with options
 	
 	protected void initContextMenuItems() {
-        
-		
+        		
 		copyMenuItem = new MenuItem("Copy");
         copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
         	@Override
@@ -281,6 +267,8 @@ public class GenericTableController<S> implements TableEventListener{
 		}
 	}
 	
+	// To create a context menu specific to a table, override this method with 
+	// required items in the context Menu
 	protected void initContextMenu() { 
 
 		contextMenu.getItems().clear();
@@ -297,9 +285,7 @@ public class GenericTableController<S> implements TableEventListener{
 		table.setEditable(true);
 		// allows the individual cells to be selected
 		table.getSelectionModel().cellSelectionEnabledProperty().set(true);
-
 	}
-	
 
 	
 	@SuppressWarnings("unchecked")
@@ -316,7 +302,6 @@ public class GenericTableController<S> implements TableEventListener{
 			// right-to-left, and then wrapping to the end of the previous line
 			TablePosition<S, ?> pos = table.getFocusModel()
 					.getFocusedCell();
-			
 			
 			if (pos.getColumn() - 1 >= 0) {
 				// go to previous row
@@ -344,24 +329,19 @@ public class GenericTableController<S> implements TableEventListener{
 		int newColumnIndex = columnIndex + offset;
 		return table.getVisibleLeafColumn(newColumnIndex);
 	}
-	
-	  
-	  
+		  
+	// refresh the table contents when the underlying observable list tracked by table gets updated  
 	public void refresh() {
 		table.getColumns().get(0).setVisible(false);
 		table.getColumns().get(0).setVisible(true);
 	}
 	
-	
-	// The keyboard handler is leveraged from the below repo.
-	// https://gist.github.com/Roland09/6fb31781a64d9cb62179
-	
+	// https://gist.github.com/Roland09/6fb31781a64d9cb62179	
 	public  void installKeyboardHandler() {
 		// install copy/paste keyboard handler
 		table.setOnKeyPressed(new TableKeyEventHandler());
 
 	}
-	
 	
 	/**
 	 * Copy/Paste keyboard event handler. The handler uses the keyEvent's source for
@@ -385,6 +365,7 @@ public class GenericTableController<S> implements TableEventListener{
 
 					// event is handled, consume it
 					keyEvent.consume();
+
 				} 
 				else if (copyKeyCodeCombination.match(keyEvent)) {
 
@@ -434,7 +415,7 @@ public class GenericTableController<S> implements TableEventListener{
 		
 		
 		for (int i = 0;i<len;i++) {
-			TablePosition p = positionList.get(i);
+			TablePosition<S,?> p = positionList.get(i);
 			rowArray[i] = p.getRow();
 			colArray[i] = p.getColumn();
 		}
@@ -460,7 +441,7 @@ public class GenericTableController<S> implements TableEventListener{
 		}
 		
 		ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
-
+		
 		int prevRow = -1;
 
 		for (TablePosition position : positionList) {
@@ -492,20 +473,19 @@ public class GenericTableController<S> implements TableEventListener{
 		clipboardContent.putString(clipboardString.toString());
 
 		// set clipboard content
-		Clipboard.getSystemClipboard().setContent(clipboardContent);
-		
+		Clipboard.getSystemClipboard().setContent(clipboardContent);		
 	}
 
 	protected  void pasteFromClipboard( ) {
-				
-		// return if there's not cell selected to start with
+		
+		// abort if there's not cell selected to start with
 		if( table.getSelectionModel().getSelectedCells().size() == 0) {
 			return;
 		}
-				
+						
 		// get the cell position to start with
-		TablePosition pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
-		
+		TablePosition<S, ?> pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
+				
 		String pasteString = Clipboard.getSystemClipboard().getString();
 		
 		int rowClipboard = -1;
@@ -546,12 +526,9 @@ public class GenericTableController<S> implements TableEventListener{
 		    		setValue(row,col,clipboardCellContent);
 		    	} else {
 		    		continue;
-		    	}
-		    	
+		    	}		    	
 		    }
-
 		}
-		
 	}
 	
 	protected int insertRowAbove() { 
@@ -559,18 +536,17 @@ public class GenericTableController<S> implements TableEventListener{
 		if( table.getSelectionModel().getSelectedCells().size() == 0) {
 			return -1;
 		}
-		
+					
 		// get the cell position to start with
 		int row = table.getSelectionModel().getSelectedCells().get(0).getRow();
-
+		
     	// skip if we reached the end of the table
     	if( row >= table.getItems().size()) {
     		return -1;
     	}
     	
-    	return row;    	    	
+    	return row;   	    	
 	}
-	
 	
 		
 	protected int deleteRow() { 
@@ -583,6 +559,5 @@ public class GenericTableController<S> implements TableEventListener{
 		int deleteRowPosition = table.getSelectionModel().getSelectedCells().get(0).getRow();
 
 		return deleteRowPosition;
-	}
-
+	}	
 }

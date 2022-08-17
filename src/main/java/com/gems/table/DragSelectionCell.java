@@ -1,6 +1,6 @@
 /*
 	DragSelectionCell.java
-    Copyright (C) 2019  Sriram C.
+	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,7 @@
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+*/ 
 
 package com.gems.table;
 
@@ -48,15 +48,12 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 	public DragSelectionCell(final StringConverter<T> converter) {
 		super(converter);
 		
-		dragEvent();
-		
+		dragEvent();		
 	}
 	
 
-	public DragSelectionCell() {
-		
-		dragEvent();
-		
+	public DragSelectionCell() {		
+		dragEvent();		
 	}
 	
 	public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
@@ -75,23 +72,23 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
         ObservableList<TableColumn <S,?>>  list = getTableColumn().getTableView().getColumns();        
         int endCol = list.indexOf(getTableColumn());
 		int endRow = getIndex();
-
-        // System.out.println("On Drag Detected " +endRow + " " + endCol);
         
+        // Clear old rectangle
+        // FIXME - only the rectangle selection should be cleared and not the previous selection
 		getTableColumn().getTableView().getSelectionModel().clearSelection();	
 		
 		// is the below two lines needed
 		getTableColumn().getTableView().getSelectionModel().setCellSelectionEnabled(true);//
 		getTableColumn().getTableView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Select Rectangle
-        for (int i = (startRow <= endRow) ? startRow:endRow; i <= ((startRow < endRow)?endRow:startRow);i++) {        	
-            for (int j = (startCol <= endCol) ? startCol:endCol; j <= ((startCol < endCol) ? endCol : startCol);j++) {
-        		
-            	getTableColumn().getTableView().getSelectionModel().select(i, list.get(j));  	
-            	
-            }       	
-        }
+		// Select Rectangle
+		for (int i = (startRow <= endRow) ? startRow : endRow; i <= ((startRow < endRow) ? endRow : startRow); i++) {        	
+			for (int j = (startCol <= endCol) ? startCol : endCol; j <= ((startCol < endCol) ? endCol : startCol);j++) {
+
+				getTableColumn().getTableView().getSelectionModel().select(i, list.get(j));  	
+
+			}       	
+		}
            
 	}
 	
@@ -105,19 +102,15 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 	                
 	                ObservableList<TableColumn <S,?>>  columnList = getTableColumn().getTableView().getColumns();
 	                startCol = columnList.indexOf(getTableColumn());
-	                startRow = getIndex();
-	                
+	                startRow = getIndex();	                
 	            }  
 	        });  
 	       
 	        setOnMouseDragEntered(new EventHandler<MouseDragEvent>() {  
 
 	            @Override  
-	            public void handle(MouseDragEvent event) {  
-	                // System.out.println("On Drag Entered " +getIndex() + " " + getTableColumn());
-	                
+	            public void handle(MouseDragEvent event) {  	                
 	                selectRectangle();
-
 	            }  
 	            
 	        });  
@@ -126,9 +119,6 @@ public class DragSelectionCell<S,T> extends TextFieldTableCell<S, T> {
 
 	            @Override  
 	            public void handle(MouseDragEvent event) {  
-	                //getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());  
-	                // System.out.println("On Drag exited " +getIndex() + " " + getTableColumn());
-
 	            }  
 	            
 	        });  
