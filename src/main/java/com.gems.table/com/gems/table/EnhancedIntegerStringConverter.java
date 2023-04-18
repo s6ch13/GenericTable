@@ -1,5 +1,5 @@
 /*
-	MyIntegerStringConverter.java
+	EnhancedIntegerStringConverter.java
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ package com.gems.table;
 
 import javafx.util.converter.IntegerStringConverter;
 
-public class MyIntegerStringConverter extends IntegerStringConverter {
+public class EnhancedIntegerStringConverter extends IntegerStringConverter {
 
 	@Override
 	public Integer fromString(final String value) {

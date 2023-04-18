@@ -1,5 +1,5 @@
 /*
-	MyFloatStringConverter.java
+	EnhancedFloatStringConverter.java
 	Copyright (C) 2019  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
@@ -34,15 +34,15 @@ package com.gems.table;
 
 import javafx.util.converter.FloatStringConverter;
 
-public class MyFloatStringConverter extends FloatStringConverter {
+public class EnhancedFloatStringConverter extends FloatStringConverter {
 
 	private String format = "%.4f";
 
-	public MyFloatStringConverter() { 
+	public EnhancedFloatStringConverter() { 
 		super();
 	}
 
-	public MyFloatStringConverter(String format) { 
+	public EnhancedFloatStringConverter(String format) { 
 		super();
 		this.format = format;
 	}
@@ -78,14 +78,7 @@ public class MyFloatStringConverter extends FloatStringConverter {
 		// exponent value
 		boolean e = false;  // occurrence of E pt
 		int epos = 0; // position of exponent value
-		
-		if (value.compareTo(".") == 0 || 
-				value.compareTo("-") ==0 || 
-				value.compareTo("-") ==0 || 
-				value.compareTo("+") ==0 || 
-				value.compareTo("e") ==0 || 
-				value.compareTo("E") ==0 )
-			return false;
+		boolean digitFound = false;	// ensure that atleast a number is present
 		
 		for (int i = 0; i < size; i++) {
 			
@@ -101,8 +94,11 @@ public class MyFloatStringConverter extends FloatStringConverter {
 				return false;
 			}
 			
+			if (Character.isDigit(value.charAt(i)))
+				digitFound = true;
+			
 			// parse decimal pt
-			if (value.charAt(i) == '.' && size > 1) {
+			if (value.charAt(i) == '.' && size > 1 ) {
 				if(decimalPt == false) {
 					decimalPt = true;
 				} else {
@@ -112,7 +108,7 @@ public class MyFloatStringConverter extends FloatStringConverter {
 			
 			// parse exponent
 			if (value.charAt(i) == 'e' || value.charAt(i) == 'E') {
-				if(e == false) {
+				if(e == false && i > 0 && Character.isDigit(value.charAt(i-1))) {
 					e = true;
 					epos = i; // position of e in string.  
 				} else {
@@ -121,16 +117,21 @@ public class MyFloatStringConverter extends FloatStringConverter {
 			}
 			
 			// -ve and +ve sign can be only at the first position or 
-			// after occurrence of E/e.  
-			if(value.charAt(i) == '-' && (i != 0  && i != epos +1)) {
-				return false;
+			// immediately after occurrence of E/e.  
+			if(value.charAt(i) == '-' || value.charAt(i) == '+') { 
+				if (i == 0)
+					continue;
+				if (e == true && i == epos+1) {
+					continue;
+				} else { 
+					return false;
+				}
 			}
-
-			if(value.charAt(i) == '+' &&  (i != 0  && i != epos+1))  {
-				return false;
-			}			
 		}
 		
-		return true;
-	}
+		if (!digitFound) 
+			return false;
+		else 
+			return true;
+	}	
 }

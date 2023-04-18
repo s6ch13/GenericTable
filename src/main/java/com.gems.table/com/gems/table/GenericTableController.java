@@ -43,13 +43,20 @@
 package com.gems.table;
 
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -62,18 +69,29 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 
-public abstract class GenericTableController<S> implements TableEventListener{
+public abstract class GenericTableController<S> implements TableEventListener {
 
 	public TableView<S> table;
-	protected ScrollPane tableScrollPane;
 	protected boolean tableSelected = false; // variable to track if this table is under focus
 
 	// create context Menu
 	protected ContextMenu contextMenu;
 	protected MenuItem copyMenuItem, pasteMenuItem, cutMenuItem, deleteMenuItem, selectAllMenuItem;
 	protected MenuItem insertRowAboveMenuItem, deleteRowMenuItem;
+
+	protected ScrollPane tableScrollPane;
+	Bounds tableBounds;
+	double topYProximity, bottomYProxmity,leftXProxmity, rightXProxmity;
+	final double tableEdgeRegion = 50;	// Proximity from the edge where scroll is started
+
+	protected enum ScrollMode {
+		UP, DOWN, LEFT, RIGHT, NONE
+	}
+
+	private AutoScrollableTableThread autoScrollThread = null;
 	
 	public void init() {
 		
@@ -84,13 +102,41 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		installKeyboardHandler();
 		initContextMenuItems();
         initContextMenu();		
-
 		
 		updateColumnHeaders();
 		initFocusChange();
-		
+	    	
+		table.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+			@Override
+			public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+				if (newValue == null)
+					return;
+
+				tableBounds = newValue;
+
+				// Area At Top Of Table View. i.e Initiate Upwards Auto Scroll If
+				// We Detect Mouse Being Dragged Above This Line.
+				topYProximity = tableBounds.getMinY() + tableEdgeRegion;
+
+				// Area At Bottom Of Table View. i.e Initiate Downwards Auto Scroll If
+				// We Detect Mouse Being Dragged Below This Line.
+				bottomYProxmity = tableBounds.getMaxY() - tableEdgeRegion;
+
+				// Area At Left Of Table View. i.e Initiate leftward Auto Scroll If
+				// We Detect Mouse Being Dragged left of this Line.
+				leftXProxmity = tableBounds.getMinX() + tableEdgeRegion;
+
+				// Area At Right Of Table View. i.e Initiate rightward Auto Scroll If
+				// We Detect Mouse Being Dragged right of this Line.
+				rightXProxmity = tableBounds.getMaxX() - tableEdgeRegion;
+			}
+		});
+
+		tableScrollOnDrag();
+
     	TableEventObject.getInstance().addTableEventListener(this);
 	}
+    	
 	
 	// We receive this event when the table focus changes
 	// so we can clear the selections in the table.  
@@ -102,8 +148,13 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		table.getSelectionModel().clearSelection();
 	}
 	
+	/**
+	 * When a change occurs / new row is selected we receive this event. Let other
+	 * tables know about the selection in this table so they can clear their
+	 * selections (which would now be stale)
+	 */
 	public void initFocusChange() {
-		// Everytime a change occurs / new row is selected we receive this event		
+		
 		table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 		    if (newSelection != null) {
 		    	if ( tableSelected == false) {
@@ -115,26 +166,73 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		    	}
 		    }
 		});
-
 	}
 	
-	public abstract String getValue(int row,int col);
 	
+	/**
+	 * Returns the String value of the cell selected. This method should be
+	 * implemented in the child classes
+	 * 
+	 * @param row - row number
+	 * @param col - column number
+	 * @return String value of the cell selected
+	 */
+	public abstract String getValue(int row,int col);
+
+	
+	/**
+	 * Sets the String value of the cell selected. This method should be implemented
+	 * in the child classes
+	 * 
+	 * @param row    - row number
+	 * @param col    - column number
+	 * @param String value of the cell selected
+	 */
 	public abstract void setValue(int row,int col,String val);
 	
-	protected boolean isCellContentValid(int row,int col,String clipboardCellContent) {
+	
+	/**
+	 * Checkf if the cell content for a given row / column is valid. This prevents
+	 * pasting of incorrect type into a table column. This can also be used to
+	 * prevent pasting contents into certain cells.
+	 * 
+	 * This method should be overridden where the check is actually implemented.
+	 * 
+	 * @param row                  - table row for cell
+	 * @param col                  - table col for cell
+	 * @param clipboardCellContent - content for cell
+	 * @return true if content is valid.
+	 */
+	protected boolean isCellContentValid(int row, int col, String clipboardCellContent) {
 		return true;
 	}
 	
+	/**
+	 * clears value of the cell selected. This method should be implemented in the
+	 * child class where the value of the cell after clearing is set.
+	 * 
+	 * @param row - row number
+	 * @param col - column number
+	 */
 	public abstract void clearValue(int row,int col);
 	
+	/**
+	 * Handle event for updating the column headers of the table
+	 */
 	protected void updateColumnHeaders() {}
 	
+	/**
+	 * 
+	 * @return contextMenu
+	 */
 	public ContextMenu getContextMenu() { 
 		return contextMenu;
 	}
 			
-	
+	/**
+	 * Handle table event received by this class for cut/copy/paste/delete
+	 * table-focus change, insert row above, delete row
+	 */
 	public void tableEventReceived(TableEvent event) {
 		
 		
@@ -170,10 +268,10 @@ public abstract class GenericTableController<S> implements TableEventListener{
 	
 	}
 	
-
-	// Handle Right Click on the Table
-	// Create a context menu with options
-	
+	/**
+	 * Initialize context menu items with handling functions for commonly used
+	 * actions like cut copy, paste, delete insert row above, delete row.
+	 */
 	protected void initContextMenuItems() {
         		
 		copyMenuItem = new MenuItem("Copy");
@@ -259,6 +357,11 @@ public abstract class GenericTableController<S> implements TableEventListener{
  
 	}
 
+	/**
+	 * Add additional items to the context menu
+	 *
+	 * @param mI - Array of the object of type MenuItem.
+	 */
 	protected void addContextMenuItems(MenuItem [] mI) {
 		int i = 0;
 		while ( i < mI.length ) {
@@ -266,10 +369,14 @@ public abstract class GenericTableController<S> implements TableEventListener{
 			i++;
 		}
 	}
-	
-	// To create a context menu specific to a table, override this method with 
-	// required items in the context Menu
-	protected void initContextMenu() { 
+
+	/**
+	 * Handle Right Click on the Table Create a context menu with options. typically
+	 * used for cut, copy, paste, delete insert rows above, delete rows. To create a
+	 * context menu specific to a table, override this method with required items in
+	 * the context Menu
+	 */
+	protected void initContextMenu() {
 
 		contextMenu.getItems().clear();
 	    contextMenu.getItems().addAll(copyMenuItem,
@@ -281,6 +388,9 @@ public abstract class GenericTableController<S> implements TableEventListener{
 	        		deleteRowMenuItem);
 	}
 
+	/**
+	 * 	Sets the table as editable and let individual selection of cells
+	 */
 	protected void setTableEditable() {
 		table.setEditable(true);
 		// allows the individual cells to be selected
@@ -330,24 +440,32 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		return table.getVisibleLeafColumn(newColumnIndex);
 	}
 		  
-	// refresh the table contents when the underlying observable list tracked by table gets updated  
+ 
+	/**
+	 * Refresh the table contents when the underlying observable list tracked by
+	 * table gets updated
+	 */
 	public void refresh() {
 		table.getColumns().get(0).setVisible(false);
 		table.getColumns().get(0).setVisible(true);
 	}
 	
-	// https://gist.github.com/Roland09/6fb31781a64d9cb62179	
-	public  void installKeyboardHandler() {
+	/**
+	 * Install the keyboard handler for commonly used actions on table like cut,
+	 * copy, paste, select all. reference -
+	 * https://gist.github.com/Roland09/6fb31781a64d9cb62179
+	 */
+	public void installKeyboardHandler() {
 		// install copy/paste keyboard handler
 		table.setOnKeyPressed(new TableKeyEventHandler());
-
 	}
 	
 	/**
-	 * Copy/Paste keyboard event handler. The handler uses the keyEvent's source for
-	 * the clipboard data. The source must be of type TableView.
+	 * Copy/Paste/Cut/Select all/delete/backspace keyboard event handler. The
+	 * handler uses the keyEvent's source for the clipboard data. The source must be
+	 * of type TableView.
 	 */
-	public  class TableKeyEventHandler implements EventHandler<KeyEvent> {
+	public class TableKeyEventHandler implements EventHandler<KeyEvent> {
 
 		KeyCodeCombination cutKeyCodeCombination = new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN);
 		KeyCodeCombination copyKeyCodeCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
@@ -387,23 +505,33 @@ public abstract class GenericTableController<S> implements TableEventListener{
 					// Delete contents of cell
 					deleteSelection();
 					keyEvent.consume();
-				}
-				
-				else if (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) {
+				} else if (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) {
 					// when character or numbers pressed it will start edit in editable
 					// fields
 					editFocusedCell();
 					
-				} 
-				
+				} 				
 			  
 			}
-
 		}
-
 	}
 	
+	/**
+	 * Check if any cells in this table are selected
+	 * 
+	 * @return true / false
+	 */
+	public boolean isTableCellSelected() {
+		return (table.getSelectionModel().getSelectedCells().size() > 0);
+	}
+	
+	/**
+	 * Delete the contents of the selected cell.
+	 */
 	public void deleteSelection() {
+		if (!isTableCellSelected()) 
+			return;
+		
 		List<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
 
 		if (positionList == null) 
@@ -421,7 +549,7 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		}
 		
 		for (int i = 0;i<len;i++) {
-			// we cannot clear the first row
+			// we cannot clear the first column
 			if (colArray[i] > 0)
 				clearValue(rowArray[i],colArray[i]);
 		}
@@ -430,15 +558,15 @@ public abstract class GenericTableController<S> implements TableEventListener{
 
 	/**
 	 * Get table selection and copy it to the clipboard.
+	 * 
 	 * @param table
 	 */
 	public void copySelectionToClipboard() {
 
-		StringBuilder clipboardString = new StringBuilder();
-
-		if( table.getSelectionModel().getSelectedCells().size() == 0) {
+		if (!isTableCellSelected()) 
 			return;
-		}
+
+		StringBuilder clipboardString = new StringBuilder();
 		
 		ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
 		
@@ -476,12 +604,16 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		Clipboard.getSystemClipboard().setContent(clipboardContent);		
 	}
 
-	protected  void pasteFromClipboard( ) {
+	/**
+	 * Paste the contents of the clipboard at the cell selected in the table. Only
+	 * the cells that fit into the table are pasted and remaining clip board
+	 * contents are ignored Rows are expected to be delineated by /n while columns
+	 * are expected to be delineated by /t
+	 */
+	protected void pasteFromClipboard() {
 		
-		// abort if there's not cell selected to start with
-		if( table.getSelectionModel().getSelectedCells().size() == 0) {
+		if (!isTableCellSelected()) 
 			return;
-		}
 						
 		// get the cell position to start with
 		TablePosition<S, ?> pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
@@ -531,11 +663,14 @@ public abstract class GenericTableController<S> implements TableEventListener{
 		}
 	}
 	
-	protected int insertRowAbove() { 
-		// abort if there's not cell selected to start with
-		if( table.getSelectionModel().getSelectedCells().size() == 0) {
+	/**
+	 * Insert row to the table above the selected cell.
+	 * 
+	 * @return position of the row being inserted. On error, returns -1
+	 */
+	protected int insertRowAbove() {
+		if (!isTableCellSelected()) 
 			return -1;
-		}
 					
 		// get the cell position to start with
 		int row = table.getSelectionModel().getSelectedCells().get(0).getRow();
@@ -548,16 +683,190 @@ public abstract class GenericTableController<S> implements TableEventListener{
     	return row;   	    	
 	}
 	
-		
-	protected int deleteRow() { 
-		// abort if there's not cell selected to start with
-		if( table.getSelectionModel().getSelectedCells().size() == 0) {
+	/**
+	 * Delete row at the cursor. Only one row is deleted at a time. If multiple rows
+	 * are selected, only the top most row is deleted
+	 * 
+	 * @return index of the row being deleted. On error, returns -1
+	 */
+	protected int deleteRow() {
+		if (!isTableCellSelected()) 
 			return -1;
-		}
 					
 		// get the cell position to start with
 		int deleteRowPosition = table.getSelectionModel().getSelectedCells().get(0).getRow();
 
 		return deleteRowPosition;
 	}	
+	
+	
+	/**
+	 * Setup the table such that when the mouse is dragged to select cells and goes
+	 * beyond the table visible view, the table needs to scroll to enable further
+	 * selection.
+	 */
+	private void tableScrollOnDrag() {
+		table.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+
+				double dragY = event.getY();
+				double dragX = event.getX();
+
+				// Make Use Of A Thread To scroll the table Up/Down/Left/Right if
+				// The cells selected are within the edges
+				if (dragY < topYProximity) {
+					// Scroll Up
+					if (autoScrollThread == null) {
+						autoScrollThread = new AutoScrollableTableThread(table);
+						autoScrollThread.scrollUp();
+						autoScrollThread.start();
+					}
+
+				} else if (dragY > bottomYProxmity) {
+					// Scroll Down
+					if (autoScrollThread == null) {
+						autoScrollThread = new AutoScrollableTableThread(table);
+						autoScrollThread.scrollDown();
+						autoScrollThread.start();
+					}
+
+				} else if (dragX < leftXProxmity) {
+					// Scroll Left
+					if (autoScrollThread == null) {
+						autoScrollThread = new AutoScrollableTableThread(table);
+						autoScrollThread.scrollLeft();
+						autoScrollThread.start();
+					}
+
+				} else if (dragX > rightXProxmity) {
+					// Scroll Right
+					if (autoScrollThread == null) {
+						autoScrollThread = new AutoScrollableTableThread(table);
+						autoScrollThread.scrollRight();
+						autoScrollThread.start();
+					}
+
+				} else {
+					// No Auto Scroll Required We Are Within Bounds
+					if (autoScrollThread != null) {
+						autoScrollThread.stopScrolling();
+						autoScrollThread = null;
+					}
+				}
+
+			}
+		});
+
+		table.setOnMouseReleased(event -> {
+			// Mouse has been released and auto-scroll should stop if active.
+			if (autoScrollThread != null) {
+				autoScrollThread.stopScrolling();
+				autoScrollThread = null;
+			}
+		});
+	}
+
+	class AutoScrollableTableThread extends Thread {
+
+		private boolean running = true;
+		private ScrollMode scrollMode = ScrollMode.NONE;
+		private ScrollBar verticalScrollBar = null;
+		private ScrollBar horizontalScrollBar = null;
+
+		// scrollIncrement can support accelerated scrolling of rows/columns
+		private double scrollIncrement = 0.01;
+
+		public AutoScrollableTableThread(TableView<S> tableView) {
+			super();
+			setDaemon(true);
+
+			// setup the scrollbar nodes if available.
+			Set<Node> scrollBars = tableView.lookupAll(".scroll-bar");
+
+			for (Node n : scrollBars) {
+				switch (((ScrollBar) n).getOrientation()) {
+				case HORIZONTAL:
+					horizontalScrollBar = (ScrollBar) n;
+					break;
+				case VERTICAL:
+					verticalScrollBar = (ScrollBar) n;
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+
+			while (running) {
+
+				Platform.runLater(() -> {
+
+					if (scrollMode == ScrollMode.UP && verticalScrollBar != null) {
+						if (verticalScrollBar.getValue() > verticalScrollBar.getMin()) {
+							verticalScrollBar.setValue(verticalScrollBar.getValue() - scrollIncrement);
+							scrollIncrement = scrollIncrement < 0.1 ? scrollIncrement * 1.1 : 0.25;
+						}
+					} else if (scrollMode == ScrollMode.DOWN && verticalScrollBar != null) {
+						if (verticalScrollBar.getValue() < verticalScrollBar.getMax()) {
+							verticalScrollBar.setValue(verticalScrollBar.getValue() + scrollIncrement);
+							scrollIncrement = scrollIncrement < 0.1 ? scrollIncrement * 1.1 : 0.25;
+						}
+					} else if (scrollMode == ScrollMode.LEFT && horizontalScrollBar != null) {
+						if (horizontalScrollBar.getValue() > horizontalScrollBar.getMin()) {
+							horizontalScrollBar.setValue(horizontalScrollBar.getValue() - scrollIncrement);
+							scrollIncrement = scrollIncrement < 5 ? scrollIncrement * 2 : 5;
+						}
+					} else if (scrollMode == ScrollMode.RIGHT && horizontalScrollBar != null) {
+						if (horizontalScrollBar.getValue() < horizontalScrollBar.getMax()) {
+							horizontalScrollBar.setValue(horizontalScrollBar.getValue() + scrollIncrement);
+							scrollIncrement = scrollIncrement < 5 ? scrollIncrement * 2 : 5;
+						}
+					} else {
+						stopScrolling();
+					}
+				});
+
+				try {
+					sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		public void scrollUp() {
+			scrollMode = ScrollMode.UP;
+			running = true;
+		}
+
+		public void scrollDown() {
+			scrollMode = ScrollMode.DOWN;
+			running = true;
+		}
+
+		public void scrollLeft() {
+			scrollMode = ScrollMode.LEFT;
+			running = true;
+		}
+
+		public void scrollRight() {
+			scrollMode = ScrollMode.RIGHT;
+			running = true;
+		}
+
+		public void stopScrolling() {
+			running = false;
+			scrollMode = ScrollMode.NONE;
+		}
+	}
+
 }

@@ -1,6 +1,6 @@
 /*
-	MyDateStringConverter.java
-	Copyright (C) 2019  Sriram C.
+	module-info.java for com.gems.table
+	Copyright (C) 2019-2023  Sriram C.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -24,26 +24,12 @@
 
 */ 
 
-package com.gems.table;
+module com.gems.table { 
+	requires javafx.controls;
+	requires javafx.fxml;
+	requires javafx.graphics;
+	requires javafx.base;
 
-import java.util.Date;
-
-import javafx.util.converter.DateStringConverter;
-
-public class MyDateStringConverter extends DateStringConverter {
-
-	public MyDateStringConverter(final String pattern) {
-		super(pattern);
-	}
-
-	@Override
-	public Date fromString(String value) {
-		// catches the RuntimeException thrown by
-		// DateStringConverter.fromString()
-		try {
-			return super.fromString(value);
-		} catch (RuntimeException ex) {
-			return null;
-		}
-	}
+	opens com.gems.table to javafx.controls, javafx.fxml;
+	exports com.gems.table;
 }

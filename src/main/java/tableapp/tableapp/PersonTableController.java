@@ -39,8 +39,8 @@ import com.gems.table.CustomTableColumn;
 import com.gems.table.DragSelectionCell;
 import com.gems.table.EditCell;
 import com.gems.table.GenericTableController;
-import com.gems.table.MyFloatStringConverter;
-import com.gems.table.MyIntegerStringConverter;
+import com.gems.table.EnhancedFloatStringConverter;
+import com.gems.table.EnhancedIntegerStringConverter;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -128,7 +128,7 @@ public class PersonTableController extends GenericTableController implements Ini
 		
 		indexColumn.setCellFactory(
 				DragSelectionCell.<PersonTableData, Integer>forTableColumn(
-						new MyIntegerStringConverter()));
+						new EnhancedIntegerStringConverter()));
 		indexColumn.setEditable(false);
 		indexColumn.setSortable(false);
 	}
@@ -172,7 +172,7 @@ public class PersonTableController extends GenericTableController implements Ini
 	private void setupAgeColumn() {			
 		ageColumn.setCellFactory(
 				EditCell.<PersonTableData, Integer>forTableColumn(
-						new MyIntegerStringConverter()));
+						new EnhancedIntegerStringConverter()));
 		// updates the age field on the PersonTableData object to the
 		// committed value
 		ageColumn.setOnEditCommit(event -> {			
@@ -213,7 +213,7 @@ public class PersonTableController extends GenericTableController implements Ini
 	
 	@Override
 	protected boolean isCellContentValid(int row, int col, String val) {
-		MyIntegerStringConverter mIC = new MyIntegerStringConverter();
+		EnhancedIntegerStringConverter mIC = new EnhancedIntegerStringConverter();
 		switch (col) {
 		
 		case 0:

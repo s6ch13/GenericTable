@@ -16,7 +16,7 @@ apply plugin: 'eclipse'
 ext.jdkver = 17
 ext.jarName = "tableApp"	
 	
-project.version = '1.0.4.0'
+project.version = '1.2.2.0'
 
 repositories {
    // Use 'jcenter' for resolving your dependencies.
@@ -29,9 +29,9 @@ repositories {
 sourceSets {
         main {
                 java {
-                        srcDirs= ["src/main/java"]
-                        outputDir = file("${buildDir}/classes")
-                        exclude '**/ignorecompile/**'
+		     srcDirs= ["src/main/java"]
+                     outputDir = file("${buildDir}/classes")
+                     exclude '**/ignorecompile/**'
                         
                 }
                 resources {
@@ -59,7 +59,7 @@ if (jdkver == 17) {
 }
 
 compileJava {
-	sourceCompatibility = jdkver
+    sourceCompatibility = jdkver
     targetCompatibility = jdkver
     options.fork = true
 }
@@ -70,7 +70,7 @@ dependencies {
     if (jdkver == 1.8) { 
         implementation group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
     } else if (jdkver >= 11) { 
-	    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.1'
+        implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.1'
     }
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }

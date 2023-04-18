@@ -29,6 +29,8 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 
 	private TextField textField;
 	private boolean escapePressed = false;
+	private boolean firstEdit = true;
+
 	private TablePosition<S, ?> tablePos = null;
 
 	public EditCell(final StringConverter<T> converter) {
@@ -122,14 +124,7 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 
 		final TextField textField = new TextField(getItemText());
 
-		textField.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-			}
-		});
-
-		// Use onAction here rather than onKeyReleased (with check for Enter),
+		// Called when ENTER is pressed on textfield
 		textField.setOnAction(event -> {
 			if (getConverter() == null) {
 				throw new IllegalStateException("StringConverter is null.");
@@ -149,16 +144,17 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 		});
 
 		textField.setOnKeyPressed(t -> {
-			if (t.getCode() == KeyCode.ESCAPE)
+			if (t.getCode() == KeyCode.ESCAPE) 
 				escapePressed = true;
 			else
 				escapePressed = false;
 		});
+		
 		textField.setOnKeyReleased(t -> {
 			if (t.getCode() == KeyCode.ESCAPE) {
 				throw new IllegalArgumentException(
 						"did not expect esc key releases here.");
-			}
+			}			
 		});
 
 		textField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -166,12 +162,28 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 				textField.setText(getConverter().toString(getItem()));
 				cancelEdit();
 				event.consume();
-			} else if (event.getCode() == KeyCode.RIGHT
-					|| event.getCode() == KeyCode.TAB) {
+			} else if (event.getCode() == KeyCode.TAB) {
 				getTableView().getSelectionModel().selectNext();
 				event.consume();
+			} else if (event.getCode() == KeyCode.RIGHT) {
+				if (isEditing()) {
+					int caratPos = textField.getCaretPosition();
+					if (caratPos < textField.getLength()) {
+						textField.positionCaret(caratPos+1);
+					}					
+				} else { 
+					getTableView().getSelectionModel().selectNext();
+				}
+				event.consume();
 			} else if (event.getCode() == KeyCode.LEFT) {
-				getTableView().getSelectionModel().selectPrevious();
+				if (isEditing()) {  
+					int caratPos = textField.getCaretPosition();
+					if (caratPos > 0) {
+						textField.positionCaret(caratPos-1);
+					}
+				} else { 
+					getTableView().getSelectionModel().selectPrevious();
+				}
 				event.consume();
 			} else if (event.getCode() == KeyCode.UP) {
 				getTableView().getSelectionModel().selectAboveCell();
@@ -180,6 +192,17 @@ public class EditCell<S, T> extends DragSelectionCell<S,T> {
 				getTableView().getSelectionModel().selectBelowCell();
 				event.consume();
 			}
+		});
+		
+		textField.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+			// to fix the issue where it won't input the first character you type on the first edit made
+			if (firstEdit && event.getCode() != KeyCode.ENTER && event.getCode() != KeyCode.ESCAPE && 
+					event.getCode() != KeyCode.LEFT && event.getCode() != KeyCode.RIGHT) {
+				textField.setText(event.getText());
+				textField.positionCaret(textField.getText().length()) ;
+				firstEdit = false;		
+				event.consume();
+			} 		
 		});
 
 		return textField;
