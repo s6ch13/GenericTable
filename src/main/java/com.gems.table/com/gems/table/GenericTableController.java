@@ -74,7 +74,7 @@ import javafx.scene.input.MouseEvent;
 
 public abstract class GenericTableController<S> implements TableEventListener {
 
-	public TableView<S> table;
+	protected TableView<S> table;
 	protected boolean tableSelected = false; // variable to track if this table is under focus
 
 	// create context Menu
@@ -87,7 +87,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	double topYProximity, bottomYProxmity,leftXProxmity, rightXProxmity;
 	final double tableEdgeRegion = 50;	// Proximity from the edge where scroll is started
 
-	protected enum ScrollMode {
+	private enum ScrollMode {
 		UP, DOWN, LEFT, RIGHT, NONE
 	}
 
@@ -140,9 +140,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	
 	// We receive this event when the table focus changes
 	// so we can clear the selections in the table.  
-	public void clearTableSelection(String id) {
-		// return if we receive our own event or if we werent the last selected table
-		if (table.getId() == id || tableSelected==false) return;
+	private void clearTableSelection(String id) {
+		// return if we receive our own event or if we weren't the last selected table
+		if (table.getId() == id || tableSelected==false) 
+			return;
 
 		tableSelected = false;
 		table.getSelectionModel().clearSelection();
@@ -153,7 +154,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * tables know about the selection in this table so they can clear their
 	 * selections (which would now be stale)
 	 */
-	public void initFocusChange() {
+	protected void initFocusChange() {
 		
 		table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 		    if (newSelection != null) {
@@ -235,6 +236,12 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 */
 	public void tableEventReceived(TableEvent event) {
 		
+		if (event.tableEventType() == TableEventType.TABLE_FOCUS_CHANGED) {
+			clearTableSelection((String)event.tableEventObject());
+		}
+		
+		if (!isTableCellSelected())	
+			return;
 		
 		if (event.tableEventType() == TableEventType.COPY) {
 			copySelectionToClipboard();
@@ -251,11 +258,6 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		
 		if (event.tableEventType() == TableEventType.DELETE) {
     		deleteSelection();
-		}
-		
-		
-		if (event.tableEventType() == TableEventType.TABLE_FOCUS_CHANGED) {
-			clearTableSelection((String)event.tableEventObject());
 		}
 		
 		if (event.tableEventType() == TableEventType.INSERT_ROW_ABOVE) {
@@ -278,7 +280,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
         copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
         	@Override
             public void handle(ActionEvent event) {
-        		copySelectionToClipboard();
+
+        		if (isTableCellSelected())	
+            		copySelectionToClipboard();
+
 				event.consume();
             } 	
         });
@@ -287,7 +292,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
         pasteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	pasteFromClipboard();
+
+        		if (isTableCellSelected())	
+                	pasteFromClipboard();
+
 				event.consume();
             }
         });
@@ -295,9 +303,13 @@ public abstract class GenericTableController<S> implements TableEventListener {
         cutMenuItem = new MenuItem("Cut");
         cutMenuItem.setOnAction(new EventHandler<ActionEvent>() {
         	@Override
-            public void handle(ActionEvent event) {
-        		copySelectionToClipboard();
-        		deleteSelection();
+            public void handle(ActionEvent event) {        		
+
+        		if (isTableCellSelected()) {
+        			copySelectionToClipboard();
+        			deleteSelection();
+        		}
+        		
 				event.consume();
             } 	
         });
@@ -306,7 +318,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
         deleteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	deleteSelection();
+
+        		if (isTableCellSelected())	
+                	deleteSelection();
+
 				event.consume();
             }
         });
@@ -315,7 +330,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
         selectAllMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-        		table.getSelectionModel().selectAll();
+
+        		if (isTableCellSelected())	
+            		table.getSelectionModel().selectAll();
+
 				event.consume();
             }
         });
@@ -324,7 +342,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
         insertRowAboveMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-        		insertRowAbove();
+
+        		if (isTableCellSelected())	
+            		insertRowAbove();
+
 				event.consume();
             }
         });
@@ -333,19 +354,21 @@ public abstract class GenericTableController<S> implements TableEventListener {
         deleteRowMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-        		deleteRow();
+
+        		if (isTableCellSelected())	
+            		deleteRow();
+
 				event.consume();
             }
         });
-        
-        
+               
         if (contextMenu == null) {
         	contextMenu = new ContextMenu();
         }
  
         initContextMenu();
  
-        // When user right-click on Circle
+        // When user right-clicks on table cell
         table.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
  
             @Override
@@ -386,6 +409,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	        		selectAllMenuItem,
 	        		insertRowAboveMenuItem,
 	        		deleteRowMenuItem);
+	    
 	}
 
 	/**
@@ -402,6 +426,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	protected void editFocusedCell() {
 		final TablePosition<S, ?> focusedCell = table
 				.focusModelProperty().get().focusedCellProperty().get();
+		
 		table.edit(focusedCell.getRow(), focusedCell.getTableColumn());
 	}
 	
@@ -455,7 +480,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * copy, paste, select all. reference -
 	 * https://gist.github.com/Roland09/6fb31781a64d9cb62179
 	 */
-	public void installKeyboardHandler() {
+	private void installKeyboardHandler() {
 		// install copy/paste keyboard handler
 		table.setOnKeyPressed(new TableKeyEventHandler());
 	}
@@ -465,32 +490,29 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * handler uses the keyEvent's source for the clipboard data. The source must be
 	 * of type TableView.
 	 */
-	public class TableKeyEventHandler implements EventHandler<KeyEvent> {
+	private class TableKeyEventHandler implements EventHandler<KeyEvent> {
 
 		KeyCodeCombination cutKeyCodeCombination = new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN);
 		KeyCodeCombination copyKeyCodeCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
 		KeyCodeCombination pasteKeyCodeCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
-		KeyCodeCombination selectAllKeyCodeCombination = new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN);
+		KeyCodeCombination selectAllKeyCodeCombination = new KeyCodeCombination(KeyCode.A,
+				KeyCombination.SHORTCUT_DOWN);
 
 		public void handle(final KeyEvent keyEvent) {
-			if (keyEvent.getSource() instanceof TableView) {
-				
+			if (keyEvent.getSource() instanceof TableView && isTableCellSelected()) {
+
 				if (cutKeyCodeCombination.match(keyEvent)) {
 
-					// cut is simulated as to clipboard and clear cells
+					// cut is simulated as copy to clipboard and clear cells
 					copySelectionToClipboard();
 					deleteSelection();
-
-					// event is handled, consume it
 					keyEvent.consume();
-
-				} 
-				else if (copyKeyCodeCombination.match(keyEvent)) {
+				} else if (copyKeyCodeCombination.match(keyEvent)) {
 
 					// copy to clipboard
 					copySelectionToClipboard();
-					keyEvent.consume();
-
+					keyEvent.consume();	
+					
 				} else if (pasteKeyCodeCombination.match(keyEvent)) {
 
 					pasteFromClipboard();
@@ -498,20 +520,20 @@ public abstract class GenericTableController<S> implements TableEventListener {
 					
 				} else if (selectAllKeyCodeCombination.match(keyEvent)) {
 
-	        		table.getSelectionModel().selectAll();
+					table.getSelectionModel().selectAll();
 					keyEvent.consume();
-
-				} else if (keyEvent.getCode() == KeyCode.DELETE || keyEvent.getCode() == KeyCode.BACK_SPACE ) {
+					
+				} else if (keyEvent.getCode() == KeyCode.DELETE || keyEvent.getCode() == KeyCode.BACK_SPACE) {
 					// Delete contents of cell
 					deleteSelection();
-					keyEvent.consume();
+					keyEvent.consume();	
+					
 				} else if (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) {
 					// when character or numbers pressed it will start edit in editable
 					// fields
 					editFocusedCell();
-					
-				} 				
-			  
+				}
+
 			}
 		}
 	}
@@ -554,6 +576,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 				clearValue(rowArray[i],colArray[i]);
 		}
 	
+		refresh();
 	}
 
 	/**
@@ -619,7 +642,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		TablePosition<S, ?> pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
 				
 		String pasteString = Clipboard.getSystemClipboard().getString();
-		
+
 		int rowClipboard = -1;
 		
 		StringTokenizer rowTokenizer = new StringTokenizer( pasteString, "\n");
@@ -661,6 +684,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		    	}		    	
 		    }
 		}
+		refresh();
 	}
 	
 	/**

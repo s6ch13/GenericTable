@@ -4,25 +4,28 @@ plugins {
 	id 'application'
   	id 'eclipse'
   	
-    	id 'org.openjfx.javafxplugin' version '0.0.10' apply false
+    	id 'org.openjfx.javafxplugin' version '0.1.0' apply false
 	//https://github.com/johnrengelman/shadow
 	// for creating fat jar.
-	id 'com.github.johnrengelman.shadow' version '7.1.0'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-ext.jdkver = 17
+ext.jdkver = 21
 ext.jarName = "tableApp"	
 	
-project.version = '1.2.2.0'
+project.version = '1.3.0.0'
+
+ext.currentOS = org.gradle.internal.os.OperatingSystem.current()
+ext.arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH)						
 
 repositories {
-   // Use 'jcenter' for resolving your dependencies.
-   // You can declare any Maven/Ivy/file repository here.
-	mavenLocal()
-	jcenter()
+    // Use 'mavenCentral' for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    mavenLocal()
+    mavenCentral()
 }	
 	 
 	
@@ -30,10 +33,15 @@ sourceSets {
         main {
                 java {
 		     srcDirs= ["src/main/java"]
-                     outputDir = file("${buildDir}/classes")
                      exclude '**/ignorecompile/**'
-                        
+		     
+		     if (project.ext.jdkver == 1.8) {
+			exclude 'module-info.java'
+		     }
+
+		     destinationDirectory.set(file("${buildDir}/classes"))
                 }
+		
                 resources {
                         srcDirs= ["src/main/java/"]
                 }
@@ -58,6 +66,17 @@ if (jdkver == 17) {
 	}
 }
 
+if (jdkver == 21) {
+   	apply plugin:  'org.openjfx.javafxplugin'
+	javafx {
+    	       modules = [ 'javafx.controls','javafx.fxml' ]
+
+	       // 	mac os 10.x doesnt support javafx version 21.
+	       //	so use 17.0.2 instead
+	       version = (currentOS.isMacOsX() && arch == 'x86_64') ? "17.0.2" : "21.0.5"
+	}
+} 
+
 compileJava {
     sourceCompatibility = jdkver
     targetCompatibility = jdkver
@@ -68,9 +87,9 @@ compileJava {
 dependencies {
     // controlsfx & jfoenix         
     if (jdkver == 1.8) { 
-        implementation group: 'org.controlsfx', name: 'controlsfx', version: '8.40.15'
+        implementation group: 'org.controlsfx', name: 'controlsfx', version: '8.40.18'
     } else if (jdkver >= 11) { 
-        implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.1'
+        implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.2.0'
     }
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
@@ -81,8 +100,8 @@ mainClassName = 'tableapp.Main'
 
 task copyJars (type: Copy) {
     def fromDir = "build/libs/"
-	def toDir = "./"
-	include jarName
+    def toDir = "./"
+    include jarName
  
     // copy jars to lib folder:
     from fromDir
@@ -96,8 +115,6 @@ tasks.withType(JavaCompile) {
 build.dependsOn copyJars
 
 jar {
-
-    archiveName = jarName
 
      manifest {
         attributes (
@@ -125,5 +142,5 @@ task copyJar(type: Copy) {
     into toDir
 }
 
-build.dependsOn copyJar
-assemble.dependsOn copyJar
+build.finalizedBy copyJar
+assemble.finalizedBy copyJar
