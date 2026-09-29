@@ -35,8 +35,8 @@ public class TableEventObject {
 	private static TableEventObject tableEventObject = new TableEventObject();
 	
 	// Singleton initialization
-	public TableEventObject() {
-	}	
+	private TableEventObject() {
+	}
 	public static TableEventObject getInstance() {
 		return tableEventObject;
 	}

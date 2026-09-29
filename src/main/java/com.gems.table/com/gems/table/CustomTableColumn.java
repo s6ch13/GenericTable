@@ -39,26 +39,23 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 	Label label;
     StackPane stack;
 
-	
 	public CustomTableColumn() {
 		super();
 		label = new Label();
 		stack = new StackPane();
 		
-		headerText = new String(getText());
+		headerText = getText().trim();
 		customHeader();
 	}
 	
 	public CustomTableColumn(String s) {
 		super(s);
-		headerText = new String(s.trim());
+		headerText = s.trim();
 
 		label = new Label();
 		stack = new StackPane();
 		customHeader();
 	}
-	
-	
 	
 	public void customHeader() {
 	    //label.setStyle("-fx-padding: 8px;");

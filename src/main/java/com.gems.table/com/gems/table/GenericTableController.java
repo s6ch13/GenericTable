@@ -43,6 +43,7 @@
 package com.gems.table;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -141,12 +142,21 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	public TableView<S> getTable() {
 		return table;
 	}
+
+	/**
+	 * Unregister this controller from the table event bus. Call this when the
+	 * table is no longer needed (e.g. its containing window/dialog is closed) to
+	 * avoid leaking this controller for the lifetime of the application.
+	 */
+	public void dispose() {
+		TableEventObject.getInstance().removeTableEventListener(this);
+	}
 	
 	// We receive this event when the table focus changes
 	// so we can clear the selections in the table.  
 	private void clearTableSelection(String id) {
 		// return if we receive our own event or if we weren't the last selected table
-		if (table.getId() == id || tableSelected==false) 
+		if (Objects.equals(table.getId(), id) || tableSelected==false)
 			return;
 
 		tableSelected = false;
@@ -279,93 +289,18 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * actions like cut copy, paste, delete insert row above, delete row.
 	 */
 	protected void initContextMenuItems() {
-        		
-		copyMenuItem = new MenuItem("Copy");
-        copyMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-        	@Override
-            public void handle(ActionEvent event) {
 
-        		if (isTableCellSelected())	
-            		copySelectionToClipboard();
+		copyMenuItem = newMenuItem("Copy", this::copySelectionToClipboard);
+		pasteMenuItem = newMenuItem("Paste", this::pasteFromClipboard);
+		cutMenuItem = newMenuItem("Cut", () -> {
+			copySelectionToClipboard();
+			deleteSelection();
+		});
+		deleteMenuItem = newMenuItem("Delete", this::deleteSelection);
+		selectAllMenuItem = newMenuItem("Select All", () -> table.getSelectionModel().selectAll());
+		insertRowAboveMenuItem = newMenuItem("Insert row above", this::insertRowAbove);
+		deleteRowMenuItem = newMenuItem("Delete row", this::deleteRow);
 
-				event.consume();
-            } 	
-        });
-        
-        pasteMenuItem = new MenuItem("Paste");
-        pasteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-        		if (isTableCellSelected())	
-                	pasteFromClipboard();
-
-				event.consume();
-            }
-        });
-        
-        cutMenuItem = new MenuItem("Cut");
-        cutMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-        	@Override
-            public void handle(ActionEvent event) {        		
-
-        		if (isTableCellSelected()) {
-        			copySelectionToClipboard();
-        			deleteSelection();
-        		}
-        		
-				event.consume();
-            } 	
-        });
-        
-        deleteMenuItem = new MenuItem("Delete");
-        deleteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-        		if (isTableCellSelected())	
-                	deleteSelection();
-
-				event.consume();
-            }
-        });
-
-        selectAllMenuItem = new MenuItem("Select All");
-        selectAllMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-        		if (isTableCellSelected())	
-            		table.getSelectionModel().selectAll();
-
-				event.consume();
-            }
-        });
-        
-        insertRowAboveMenuItem = new MenuItem("Insert row above");
-        insertRowAboveMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-        		if (isTableCellSelected())	
-            		insertRowAbove();
-
-				event.consume();
-            }
-        });
-        
-        deleteRowMenuItem = new MenuItem("Delete row");
-        deleteRowMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-        		if (isTableCellSelected())	
-            		deleteRow();
-
-				event.consume();
-            }
-        });
-               
         if (contextMenu == null) {
         	contextMenu = new ContextMenu();
         }
@@ -381,7 +316,21 @@ public abstract class GenericTableController<S> implements TableEventListener {
                 contextMenu.show(table, event.getScreenX(), event.getScreenY());
             }
         });
- 
+
+	}
+
+	/**
+	 * Create a context-menu item that only fires its action when a table cell is
+	 * currently selected, consuming the event either way.
+	 */
+	private MenuItem newMenuItem(String text, Runnable action) {
+		MenuItem item = new MenuItem(text);
+		item.setOnAction(event -> {
+			if (isTableCellSelected())
+				action.run();
+			event.consume();
+		});
+		return item;
 	}
 
 	/**
@@ -575,8 +524,8 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		}
 		
 		for (int i = 0;i<len;i++) {
-			// we cannot clear the first column
-			if (colArray[i] > 0)
+			// we cannot clear cells in a column the table has marked non-editable
+			if (table.getColumns().get(colArray[i]).isEditable())
 				clearValue(rowArray[i],colArray[i]);
 		}
 	
@@ -678,6 +627,11 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		    	
 		    	// we dont allow paste outside column
 		    	if( col >= table.getColumns().size()) {
+		    		continue;
+		    	}
+
+		    	// dont allow paste into a column the table has marked non-editable
+		    	if (!table.getColumns().get(col).isEditable()) {
 		    		continue;
 		    	}
 
