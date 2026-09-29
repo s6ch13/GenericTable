@@ -69,6 +69,28 @@ public class EnhancedFloatStringConverter extends FloatStringConverter {
 		return String.format(this.format, value.floatValue());
 	}
 	
+	
+	public Object toFormattedVal(final Float value) {
+		return toFormattedVal(value, this.format);
+	}
+
+	/***
+	 * Formats the value as per the format specified in the constructor.  If the value is null or NaN, returns "-"
+	 * @param value
+	 * @return
+	 */
+	public static Object toFormattedVal(final Float value, String format) {
+		if (value == null) {
+			return "-";
+		}
+
+		if (value.isNaN()) {
+			return "-";
+		}
+
+		return Float.valueOf(String.format(format, value.floatValue()));
+	}
+	
 	public boolean isNumber(String value) {
 		value = value.trim();
 

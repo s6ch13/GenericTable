@@ -68,6 +68,27 @@ public class EnhancedDoubleStringConverter extends DoubleStringConverter {
 
 		return String.format(this.format, value.doubleValue());
 	}
+	
+	public Object toFormattedVal(final Double value) {
+		return toFormattedVal(value, this.format);
+	}
+
+	/***
+	 * Formats the value as per the format specified in the constructor.  If the value is null or NaN, returns "-"
+	 * @param value
+	 * @return
+	 */
+	public static Object toFormattedVal(final Double value, String format) {
+		if (value == null) {
+			return "-";
+		}
+
+		if (value.isNaN()) {
+			return "-";
+		}
+
+		return Double.valueOf(String.format(format, value.doubleValue()));
+	}
 
 	public boolean isNumber(String value) {
 		value = value.trim();

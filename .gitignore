@@ -2,6 +2,7 @@
 *.jar
 .settings
 .classpath
+.project
 .gradle
 build/
 bin/

@@ -44,7 +44,6 @@ public class EnhancedIntegerStringConverter extends IntegerStringConverter {
 		return isNumber(value) ? super.fromString(value.trim())
 				: null;
 	}
-
 	
 	// FIXME - should also accept numbers like 1.0, 10.0 
 	public boolean isNumber(String value) {

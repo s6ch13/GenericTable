@@ -136,7 +136,11 @@ public abstract class GenericTableController<S> implements TableEventListener {
 
     	TableEventObject.getInstance().addTableEventListener(this);
 	}
-    	
+	
+	// return the table associated with this controller
+	public TableView<S> getTable() {
+		return table;
+	}
 	
 	// We receive this event when the table focus changes
 	// so we can clear the selections in the table.  
