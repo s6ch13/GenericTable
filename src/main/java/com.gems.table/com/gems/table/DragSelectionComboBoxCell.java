@@ -31,6 +31,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -39,7 +40,7 @@ import javafx.util.StringConverter;
 
 // A ComboBoxTableCell that also supports mouse-drag range selection, the same
 // way DragSelectionCell does for TextFieldTableCell-based columns. This reads
-// and writes DragSelectionCell.startRow/startCol directly (package-private,
+// and writes DragSelectionCell's per-table drag state directly (package-private,
 // same package) so a drag gesture can flow seamlessly between this cell type
 // and DragSelectionCell-backed columns in the same row.
 public class DragSelectionComboBoxCell<S, T> extends ComboBoxTableCell<S, T> {
@@ -67,32 +68,29 @@ public class DragSelectionComboBoxCell<S, T> extends ComboBoxTableCell<S, T> {
 
 	public void selectRectangle() {
 
-		ObservableList<TableColumn<S, ?>> list = getTableColumn().getTableView().getColumns();
+		TableView<S> tableView = getTableColumn().getTableView();
+		DragSelectionCell.DragState state = DragSelectionCell.dragStateFor(tableView);
+		ObservableList<TableColumn<S, ?>> list = tableView.getColumns();
 		int endCol = list.indexOf(getTableColumn());
 		int endRow = getIndex();
 
-		int startRow = DragSelectionCell.startRow;
-		int startCol = DragSelectionCell.startCol;
+		int startRow = state.startRow;
+		int startCol = state.startCol;
 
 		// Clear old rectangle
 		// FIXME - only the rectangle selection should be cleared and not the previous
 		// selection
-		getTableColumn().getTableView().getSelectionModel().clearSelection();
+		tableView.getSelectionModel().clearSelection();
 
-		getTableColumn().getTableView().getSelectionModel().setCellSelectionEnabled(true);
-		getTableColumn().getTableView().getSelectionModel()
-				.setSelectionMode(SelectionMode.MULTIPLE);
+		tableView.getSelectionModel().setCellSelectionEnabled(true);
+		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		// Select Rectangle
-		for (int i = (startRow <= endRow) ? startRow
-				: endRow; i <= ((startRow < endRow) ? endRow : startRow); i++) {
-			for (int j = (startCol <= endCol) ? startCol
-					: endCol; j <= ((startCol < endCol) ? endCol : startCol); j++) {
+		int minRow = Math.min(startRow, endRow);
+		int maxRow = Math.max(startRow, endRow);
+		int minCol = Math.min(startCol, endCol);
+		int maxCol = Math.max(startCol, endCol);
 
-				getTableColumn().getTableView().getSelectionModel().select(i, list.get(j));
-
-			}
-		}
+		tableView.getSelectionModel().selectRange(minRow, list.get(minCol), maxRow, list.get(maxCol));
 	}
 
 	public void dragEvent() {
@@ -100,13 +98,14 @@ public class DragSelectionComboBoxCell<S, T> extends ComboBoxTableCell<S, T> {
 			@Override
 			public void handle(MouseEvent event) {
 				startFullDrag();
-				getTableColumn().getTableView().getSelectionModel().select(getIndex(),
-						getTableColumn());
 
-				ObservableList<TableColumn<S, ?>> columnList = getTableColumn().getTableView()
-						.getColumns();
-				DragSelectionCell.startCol = columnList.indexOf(getTableColumn());
-				DragSelectionCell.startRow = getIndex();
+				TableView<S> tableView = getTableColumn().getTableView();
+				DragSelectionCell.DragState state = DragSelectionCell.dragStateFor(tableView);
+				tableView.getSelectionModel().select(getIndex(), getTableColumn());
+
+				ObservableList<TableColumn<S, ?>> columnList = tableView.getColumns();
+				state.startCol = columnList.indexOf(getTableColumn());
+				state.startRow = getIndex();
 			}
 		});
 

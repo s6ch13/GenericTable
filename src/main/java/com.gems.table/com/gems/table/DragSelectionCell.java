@@ -26,11 +26,15 @@
 
 package com.gems.table;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -40,8 +44,18 @@ import javafx.util.converter.DefaultStringConverter;
 
 public class DragSelectionCell<S, T> extends TextFieldTableCell<S, T> {
 
-	static int startRow;
-	static int startCol;
+	// Per-TableView drag-select state, keyed by the table identity the drag is
+	// happening in.  WeakHashMap lets a discarded table's entry be collected
+	static class DragState {
+		int startRow;
+		int startCol;
+	}
+
+	private static final Map<TableView<?>, DragState> dragStates = new WeakHashMap<>();
+
+	static DragState dragStateFor(TableView<?> tableView) {
+		return dragStates.computeIfAbsent(tableView, tv -> new DragState());
+	}
 
 	static int lastIndex;
 
@@ -66,28 +80,27 @@ public class DragSelectionCell<S, T> extends TextFieldTableCell<S, T> {
 
 	public void selectRectangle() {
 
-		ObservableList<TableColumn<S, ?>> list = getTableColumn().getTableView().getColumns();
+		TableView<S> tableView = getTableColumn().getTableView();
+		DragState state = dragStateFor(tableView);
+		ObservableList<TableColumn<S, ?>> list = tableView.getColumns();
 		int endCol = list.indexOf(getTableColumn());
 		int endRow = getIndex();
 
 		// Clear old rectangle
 		// FIXME - only the rectangle selection should be cleared and not the previous
 		// selection
-		getTableColumn().getTableView().getSelectionModel().clearSelection();
+		tableView.getSelectionModel().clearSelection();
 
 		// is the below two lines needed
-		getTableColumn().getTableView().getSelectionModel().setCellSelectionEnabled(true);//
-		getTableColumn().getTableView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		tableView.getSelectionModel().setCellSelectionEnabled(true);//
+		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		// Select Rectangle
-		for (int i = (startRow <= endRow) ? startRow : endRow; i <= ((startRow < endRow) ? endRow : startRow); i++) {
-			for (int j = (startCol <= endCol) ? startCol : endCol; j <= ((startCol < endCol) ? endCol
-					: startCol); j++) {
+		int minRow = Math.min(state.startRow, endRow);
+		int maxRow = Math.max(state.startRow, endRow);
+		int minCol = Math.min(state.startCol, endCol);
+		int maxCol = Math.max(state.startCol, endCol);
 
-				getTableColumn().getTableView().getSelectionModel().select(i, list.get(j));
-
-			}
-		}
+		tableView.getSelectionModel().selectRange(minRow, list.get(minCol), maxRow, list.get(maxCol));
 	}
 
 	public void dragEvent() {
@@ -95,11 +108,14 @@ public class DragSelectionCell<S, T> extends TextFieldTableCell<S, T> {
 			@Override
 			public void handle(MouseEvent event) {
 				startFullDrag();
-				getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());
 
-				ObservableList<TableColumn<S, ?>> columnList = getTableColumn().getTableView().getColumns();
-				startCol = columnList.indexOf(getTableColumn());
-				startRow = getIndex();
+				TableView<S> tableView = getTableColumn().getTableView();
+				DragState state = dragStateFor(tableView);
+				tableView.getSelectionModel().select(getIndex(), getTableColumn());
+
+				ObservableList<TableColumn<S, ?>> columnList = tableView.getColumns();
+				state.startCol = columnList.indexOf(getTableColumn());
+				state.startRow = getIndex();
 			}
 		});
 
