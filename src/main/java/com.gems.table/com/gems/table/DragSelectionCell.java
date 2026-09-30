@@ -57,8 +57,6 @@ public class DragSelectionCell<S, T> extends TextFieldTableCell<S, T> {
 		return dragStates.computeIfAbsent(tableView, tv -> new DragState());
 	}
 
-	static int lastIndex;
-
 	public DragSelectionCell(final StringConverter<T> converter) {
 		super(converter);
 

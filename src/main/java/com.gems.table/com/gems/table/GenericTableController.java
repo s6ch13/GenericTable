@@ -95,14 +95,15 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	private AutoScrollableTableThread autoScrollThread = null;
 	
 	public void init() {
-		
+		Objects.requireNonNull(table,
+				"GenericTableController: assign the 'table' field before calling init()");
+
 		// enable multi-selection
 		table.getSelectionModel().setCellSelectionEnabled(true);
 		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
 		installKeyboardHandler();
 		initContextMenuItems();
-        initContextMenu();		
 		
 		updateColumnHeaders();
 		initFocusChange();
@@ -201,7 +202,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * 
 	 * @param row    - row number
 	 * @param col    - column number
-	 * @param String value of the cell selected
+	 * @param val    - String value of the cell selected
 	 */
 	public abstract void setValue(int row,int col,String val);
 	
@@ -392,10 +393,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
 					.getFocusedCell();
 			
 			if (pos.getColumn() - 1 >= 0) {
-				// go to previous row
+				// go to previous column
 				table.getSelectionModel().select(pos.getRow(),
 						getTableColumn(pos.getTableColumn(), -1));
-			} else if (pos.getRow() < table.getItems().size()) {
+			} else if (pos.getRow() > 0) {
 				// wrap to end of previous row
 				table.getSelectionModel().select(pos.getRow() - 1,
 						table.getVisibleLeafColumn(
@@ -424,8 +425,7 @@ public abstract class GenericTableController<S> implements TableEventListener {
 	 * table gets updated
 	 */
 	public void refresh() {
-		table.getColumns().get(0).setVisible(false);
-		table.getColumns().get(0).setVisible(true);
+		table.refresh();
 	}
 	
 	/**
@@ -534,8 +534,6 @@ public abstract class GenericTableController<S> implements TableEventListener {
 
 	/**
 	 * Get table selection and copy it to the clipboard.
-	 * 
-	 * @param table
 	 */
 	public void copySelectionToClipboard() {
 
@@ -594,7 +592,10 @@ public abstract class GenericTableController<S> implements TableEventListener {
 		// get the cell position to start with
 		TablePosition<S, ?> pasteCellPosition = table.getSelectionModel().getSelectedCells().get(0);
 				
-		String pasteString = Clipboard.getSystemClipboard().getString();
+		Clipboard clipboard = Clipboard.getSystemClipboard();
+		if (!clipboard.hasString())
+			return;
+		String pasteString = clipboard.getString();
 
 		int rowClipboard = -1;
 		
@@ -752,8 +753,9 @@ public abstract class GenericTableController<S> implements TableEventListener {
 
 	class AutoScrollableTableThread extends Thread {
 
-		private boolean running = true;
-		private ScrollMode scrollMode = ScrollMode.NONE;
+		// written on the FX thread, read by this thread's loop
+		private volatile boolean running = true;
+		private volatile ScrollMode scrollMode = ScrollMode.NONE;
 		private ScrollBar verticalScrollBar = null;
 		private ScrollBar horizontalScrollBar = null;
 

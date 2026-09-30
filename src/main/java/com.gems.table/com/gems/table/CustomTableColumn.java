@@ -44,13 +44,13 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 		label = new Label();
 		stack = new StackPane();
 		
-		headerText = getText().trim();
+		headerText = getText() != null ? getText().trim() : "";
 		customHeader();
 	}
 	
 	public CustomTableColumn(String s) {
 		super(s);
-		headerText = s.trim();
+		headerText = s != null ? s.trim() : "";
 
 		label = new Label();
 		stack = new StackPane();
@@ -77,7 +77,7 @@ public class CustomTableColumn<S,T> extends TableColumn<S,T> {
 	}
 	
 	public void setHeaderText(String s) {
-		this.headerText = s.trim();
+		this.headerText = s != null ? s.trim() : "";
 		customHeader();
 	}
 
