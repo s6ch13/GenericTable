@@ -103,6 +103,15 @@ dependencies {
         implementation 'org.controlsfx:controlsfx:11.2.0'
     }
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // JUnit 5 for src/test/java
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 
