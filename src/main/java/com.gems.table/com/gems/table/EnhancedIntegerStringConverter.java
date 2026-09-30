@@ -32,44 +32,55 @@
 
 package com.gems.table;
 
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
+
 import javafx.util.converter.IntegerStringConverter;
 
 public class EnhancedIntegerStringConverter extends IntegerStringConverter {
 
+	// exponents ("1e5") are deliberately not accepted
+	private static final Pattern INTEGER_LIKE =
+			Pattern.compile("[+-]?(\\d+(\\.\\d*)?|\\.\\d+)");
+
 	@Override
 	public Integer fromString(final String value) {
+		if (value == null) {
+			return null;
+		}
 		if (value.trim().isEmpty()) {
 			return Integer.valueOf(0);
 		}
-		return isNumber(value) ? super.fromString(value.trim())
-				: null;
+		return parse(value);
 	}
-	
-	// FIXME - should also accept numbers like 1.0, 10.0 
+
+	/**
+	 * Check if the value is an integer. Decimals with an all-zero fraction such as
+	 * 1.0 or 10.00 are accepted.
+	 *
+	 * @param value - string to check
+	 * @return true if value can be converted to an Integer
+	 */
 	public boolean isNumber(String value) {
-		value = value.trim();
-		int size = value.length();
-		for (int i = 0; i < size; i++) {
-			
-			if(value.charAt(i) == '-' && i >0) {
-				return false;
-			}
-			
-			if(value.charAt(i) == '+' && i >0) {
-				return false;
-			}			
-			
-			// when pasting from excel, the last char is /r.  
-			// other valid digits are  0-9 + -
-			
-			if (!(Character.isDigit(value.charAt(i)) ||
-					(i == (size-1) && value.charAt(i) == '\r' ) || 
-					value.charAt(i) == '-' ||
-					value.charAt(i) == '+' ) ) {
-				return false;
-			}
-			
+		return value != null && parse(value) != null;
+	}
+
+	/**
+	 * Parse an integer, or a decimal whose fraction is all zeros ("10.0").
+	 * trim() also drops the trailing \r left when pasting from Excel.
+	 *
+	 * @return the value, or null for a non-zero fraction ("1.5"), a value outside
+	 *         the int range, or anything that is not a number
+	 */
+	private static Integer parse(String value) {
+		String s = value.trim();
+		if (!INTEGER_LIKE.matcher(s).matches()) {
+			return null;
 		}
-		return true;
+		try {
+			return new BigDecimal(s).intValueExact();
+		} catch (ArithmeticException e) {
+			return null;
+		}
 	}
 }

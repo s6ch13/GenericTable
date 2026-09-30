@@ -41,7 +41,8 @@ public class EnhancedDateStringConverter extends DateStringConverter {
 		// catches the RuntimeException thrown by
 		// DateStringConverter.fromString()
 		try {
-			return super.fromString(value);
+			Date date = super.fromString(value);
+			return (date != null && toString(date).equals(value.trim())) ? date : null;
 		} catch (RuntimeException ex) {
 			return null;
 		}

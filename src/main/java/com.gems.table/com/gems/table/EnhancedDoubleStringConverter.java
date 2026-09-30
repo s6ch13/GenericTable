@@ -49,11 +49,19 @@ public class EnhancedDoubleStringConverter extends DoubleStringConverter {
 	
 	@Override
 	public Double fromString(final String value) {
+		if (value == null) {
+			return Double.NaN;
+		}
 		if (value.trim().isEmpty()) {
 			return Double.valueOf(0.0);
 		}
-		return isNumber(value) ? super.fromString(value)
-				:Double.NaN;
+		try {
+			return isNumber(value) ? super.fromString(value)
+					:Double.NaN;
+		} catch (NumberFormatException e) {
+			// defensive: isNumber accepted something Double.valueOf rejects
+			return Double.NaN;
+		}
 	}
 	
 	@Override
@@ -100,7 +108,8 @@ public class EnhancedDoubleStringConverter extends DoubleStringConverter {
 		boolean e = false;  // occurrence of E pt
 		int epos = 0; // position of exponent value
 		boolean digitFound = false;	// ensure that atleast a number is present
-		
+		boolean expDigitFound = false;	// ensure that atleast a digit follows E/e
+
 		for (int i = 0; i < size; i++) {
 			
 			// when pasting from excel, the last char is /r.  
@@ -115,12 +124,15 @@ public class EnhancedDoubleStringConverter extends DoubleStringConverter {
 				return false;
 			}
 			
-			if (Character.isDigit(value.charAt(i)))
+			if (Character.isDigit(value.charAt(i))) {
 				digitFound = true;
+				if (e)
+					expDigitFound = true;
+			}
 			
-			// parse decimal pt
+			// parse decimal pt.  only one, and not after E/e (exponents are whole numbers)
 			if (value.charAt(i) == '.' && size > 1 ) {
-				if(decimalPt == false) {
+				if(decimalPt == false && e == false) {
 					decimalPt = true;
 				} else {
 					return false;
@@ -149,8 +161,11 @@ public class EnhancedDoubleStringConverter extends DoubleStringConverter {
 				}
 			}
 		}
-		
-		if (!digitFound) 
+
+		if (e && !expDigitFound)
+			return false;
+
+		if (!digitFound)
 			return false;
 		else 
 			return true;
