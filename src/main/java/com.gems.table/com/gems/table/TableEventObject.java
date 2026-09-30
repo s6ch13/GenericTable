@@ -26,9 +26,9 @@
 
 package com.gems.table;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TableEventObject {
 
@@ -42,48 +42,39 @@ public class TableEventObject {
 	}
 	
 	
-	private TableEventType _tet;
-	private Object _teo;
-    private List<TableEventListener> _listeners = new ArrayList<TableEventListener>();
+    // Thread safe version of ArrayList.
+    private List<TableEventListener> _listeners = new CopyOnWriteArrayList<TableEventListener>();
 
-    
-    public synchronized void copy() {
-    	_tet = TableEventType.COPY;
-    	_fireAppEvent();
-    }     
 
-    public synchronized void paste() {
-    	_tet = TableEventType.PASTE;
-    	_fireAppEvent();
-    }     
+    public void copy() {
+    	_fireAppEvent(TableEventType.COPY, null);
+    }
 
-    public synchronized void cut() {
-    	_tet = TableEventType.CUT;
-    	_fireAppEvent();
-    }  
-    
-    public synchronized void delete() {
-    	_tet = TableEventType.DELETE;
-    	_fireAppEvent();
-    }  
-    
-    
-    
-    public synchronized void tableFocusChanged(String id) {
-    	_tet = TableEventType.TABLE_FOCUS_CHANGED;
-    	_teo = id;
-    	_fireAppEvent();
-    }      
+    public void paste() {
+    	_fireAppEvent(TableEventType.PASTE, null);
+    }
 
-    public synchronized void insertRowAbove() {
-    	_tet = TableEventType.INSERT_ROW_ABOVE;
-    	_fireAppEvent();
-    }  
-    
-    public synchronized void deleteRow() {
-    	_tet = TableEventType.DELETE_ROW;
-    	_fireAppEvent();
-    }  
+    public void cut() {
+    	_fireAppEvent(TableEventType.CUT, null);
+    }
+
+    public void delete() {
+    	_fireAppEvent(TableEventType.DELETE, null);
+    }
+
+
+
+    public void tableFocusChanged(String id) {
+    	_fireAppEvent(TableEventType.TABLE_FOCUS_CHANGED, id);
+    }
+
+    public void insertRowAbove() {
+    	_fireAppEvent(TableEventType.INSERT_ROW_ABOVE, null);
+    }
+
+    public void deleteRow() {
+    	_fireAppEvent(TableEventType.DELETE_ROW, null);
+    }
     
     
     public synchronized void addTableEventListener( TableEventListener l ) {
@@ -96,8 +87,8 @@ public class TableEventObject {
 
     
     
-    private synchronized void _fireAppEvent() {
-        TableEvent tet = new TableEvent( this, _tet,_teo );
+    private synchronized void _fireAppEvent(TableEventType type, Object payload) {
+        TableEvent tet = new TableEvent( this, type, payload );
         Iterator<TableEventListener> listeners = _listeners.iterator();
         while( listeners.hasNext() ) {
             ( (TableEventListener) listeners.next() ).tableEventReceived( tet );
