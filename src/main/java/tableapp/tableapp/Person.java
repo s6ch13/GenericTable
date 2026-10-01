@@ -27,19 +27,32 @@
 
 package tableapp;
 
+import java.util.Date;
+
 public class Person {
-	
+
 	private Integer index;
 	private String name;
 	private Integer age;
+	private String department;
+	private Date joined;
+	private Double salary;	// in thousands
 
 	public Person(Integer index, String name, Integer age) {
+		this(index, name, age, "", null, 0.0);
+	}
+
+	public Person(Integer index, String name, Integer age,
+			String department, Date joined, Double salary) {
 		super();
 		this.index = index;
 		this.name = name;
 		this.age = age;
+		this.department = department;
+		this.joined = joined;
+		this.salary = salary;
 	}
-	
+
 	
 	public Integer getIndex() {
 		return index;
@@ -63,6 +76,30 @@ public class Person {
 
 	public void setAge(Integer age) {
 		this.age = age;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public Date getJoined() {
+		return joined;
+	}
+
+	public void setJoined(Date joined) {
+		this.joined = joined;
+	}
+
+	public Double getSalary() {
+		return salary;
+	}
+
+	public void setSalary(Double salary) {
+		this.salary = salary;
 	}
 
 }

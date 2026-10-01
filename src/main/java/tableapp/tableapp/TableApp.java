@@ -111,11 +111,17 @@ public class TableApp extends Application {
 		InputCommon iC = InputCommon.getInstance();
 		iC.init();		
 		
-		// Lets setup 3 names in this example to start.
+		// Lets setup a few employees in this example to start.
 		// Row number starts at 0 while index starts with 1
-		iC.addPerson(0,new Person(1,"Mary",23));
-		iC.addPerson(1,new Person(2,"John",31));
-		iC.addPerson(2,new Person(3,"Alex",53));
+		iC.addPerson(0,new Person(1,"Mary",23,"Engineering",joined("15-03-2021"),72.50));
+		iC.addPerson(1,new Person(2,"John",31,"Sales",joined("01-07-2018"),64.00));
+		iC.addPerson(2,new Person(3,"Alex",53,"Finance",joined("20-11-2009"),98.75));
+		iC.addPerson(3,new Person(4,"Priya",38,"Engineering",joined("08-06-2015"),110.25));
+		iC.addPerson(4,new Person(5,"Chen",27,"Marketing",joined("09-01-2023"),58.40));
+	}
+
+	private static java.util.Date joined(String date) {
+		return PersonTableData.DATE_CONVERTER.fromString(date);
 	}
 	
 	public void exit() {

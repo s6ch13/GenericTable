@@ -33,15 +33,19 @@
 package tableapp;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import com.gems.table.CustomTableColumn;
 import com.gems.table.DragSelectionCell;
+import com.gems.table.DragSelectionComboBoxCell;
 import com.gems.table.EditCell;
 import com.gems.table.GenericTableController;
 import com.gems.table.EnhancedFloatStringConverter;
 import com.gems.table.EnhancedIntegerStringConverter;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -53,7 +57,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
-public class PersonTableController extends GenericTableController implements Initializable{
+public class PersonTableController extends GenericTableController implements Initializable {
 
 	// Reference to the main application.
     private TableApp tableApp;
@@ -75,8 +79,20 @@ public class PersonTableController extends GenericTableController implements Ini
 
 	@FXML
 	private TableColumn<PersonTableData, Integer> ageColumn;
-	
-	
+
+	@FXML
+	private TableColumn<PersonTableData, String> departmentColumn;
+
+	@FXML
+	private TableColumn<PersonTableData, Date> joinedColumn;
+
+	@FXML
+	private TableColumn<PersonTableData, Double> salaryColumn;
+
+	static final ObservableList<String> DEPARTMENTS = FXCollections.observableArrayList(
+			"Engineering", "Sales", "Marketing", "Finance", "HR");
+
+
 	@Override
 	public void initialize(final URL url, final ResourceBundle rb) {
         bundle = rb;
@@ -95,6 +111,9 @@ public class PersonTableController extends GenericTableController implements Ini
 		setupindexColumn();
 		setupNameColumn();
 		setupAgeColumn();
+		setupDepartmentColumn();
+		setupJoinedColumn();
+		setupSalaryColumn();
 
 		setTableEditable();
 
@@ -117,11 +136,19 @@ public class PersonTableController extends GenericTableController implements Ini
 		iC.setPersonData(row,col,val);
 	}
 	
-	@Override	
+	@Override
 	public void clearValue(int row,int col) {
 		InputCommon iC = InputCommon.getInstance();
-		iC.setPersonData(row,col,new String("0"));
-	}	
+		switch (col) {
+		case 1:		// name
+		case 3:		// department
+		case 4:		// joined
+			iC.setPersonData(row,col,"");
+			break;
+		default:
+			iC.setPersonData(row,col,new String("0"));
+		}
+	}
 	
 		
 	private void setupindexColumn() {
@@ -189,12 +216,70 @@ public class PersonTableController extends GenericTableController implements Ini
 					? event.getNewValue() : event.getOldValue();
 
 			table.getItems().get(editRow).setAge(value);
-			
+
 			refresh();
 
 		});
 	}
-	
+
+	private void setupDepartmentColumn() {
+		departmentColumn.setCellFactory(
+				DragSelectionComboBoxCell.<PersonTableData, String>forTableColumn(DEPARTMENTS));
+		departmentColumn.setOnEditCommit(event -> {
+			InputCommon iC = InputCommon.getInstance();
+			int editRow = event.getTablePosition().getRow();
+			if (editRow >= iC.getNp() || editRow <0 ) {
+				System.out.println("Edit event isssue, row count > rowmax, editrow=" + editRow);
+				return;
+			}
+
+			final String value = (event.getNewValue() != null)
+					? event.getNewValue() : event.getOldValue();
+
+			table.getItems().get(editRow).setDepartment(value);
+			refresh();
+		});
+	}
+
+	private void setupJoinedColumn() {
+		joinedColumn.setCellFactory(
+				EditCell.<PersonTableData, Date>forTableColumn(PersonTableData.DATE_CONVERTER));
+		joinedColumn.setOnEditCommit(event -> {
+			InputCommon iC = InputCommon.getInstance();
+			int editRow = event.getTablePosition().getRow();
+			if (editRow >= iC.getNp() || editRow <0 ) {
+				System.out.println("Edit event isssue, row count > rowmax, editrow=" + editRow);
+				return;
+			}
+
+			final Date value = (event.getNewValue() != null)
+					? event.getNewValue() : event.getOldValue();
+
+			table.getItems().get(editRow).setJoined(value);
+			refresh();
+		});
+	}
+
+	private void setupSalaryColumn() {
+		salaryColumn.setCellFactory(
+				EditCell.<PersonTableData, Double>forTableColumn(PersonTableData.SALARY_CONVERTER));
+		salaryColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
+		salaryColumn.setOnEditCommit(event -> {
+			InputCommon iC = InputCommon.getInstance();
+			int editRow = event.getTablePosition().getRow();
+			if (editRow >= iC.getNp() || editRow <0 ) {
+				System.out.println("Edit event isssue, row count > rowmax, editrow=" + editRow);
+				return;
+			}
+
+			final Double value = (event.getNewValue() != null && !event.getNewValue().isNaN())
+					? event.getNewValue() : event.getOldValue();
+
+			table.getItems().get(editRow).setSalary(value);
+			refresh();
+		});
+	}
+
 	@FXML
 	public void addRowBelow(ActionEvent event) { 
 		InputCommon iC = InputCommon.getInstance();
@@ -225,9 +310,18 @@ public class PersonTableController extends GenericTableController implements Ini
 		case 2:
 			// Age should be an integer
 			return mIC.isNumber(val)? true: false;
-			
+		case 3:
+			// Department must be one of the combo box choices
+			return DEPARTMENTS.contains(val.trim());
+		case 4:
+			// Joined must be a date in PersonTableData.DATE_PATTERN
+			return PersonTableData.DATE_CONVERTER.fromString(val) != null;
+		case 5:
+			// Salary should be a number
+			return PersonTableData.SALARY_CONVERTER.isNumber(val);
+
 		default:
-			// max columns is 2.  If trying to paste outside table, 
+			// max columns is 5.  If trying to paste outside table,
 			// return false
 			return false;
 		}

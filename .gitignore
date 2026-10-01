@@ -4,5 +4,7 @@
 .classpath
 .project
 .gradle
+.DS_Store
 build/
 bin/
+TODO.md

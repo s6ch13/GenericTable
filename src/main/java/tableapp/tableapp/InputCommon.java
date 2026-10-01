@@ -145,11 +145,14 @@ public class InputCommon {
 		if (getNp() == 0)
 			return null;
 
-		Object obj[][] = new Object[getNp()][3];
+		Object obj[][] = new Object[getNp()][6];
 		for (int i = 0; i < getNp(); i++) {
 			obj[i][0] = personData.get(i).getIndex();
 			obj[i][1] = personData.get(i).getName();
 			obj[i][2] = personData.get(i).getAge();
+			obj[i][3] = personData.get(i).getDepartment();
+			obj[i][4] = personData.get(i).getJoined();
+			obj[i][5] = personData.get(i).getSalary();
 		}
 		return obj;
 	}

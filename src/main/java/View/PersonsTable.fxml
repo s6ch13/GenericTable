@@ -39,9 +39,9 @@
 
 <AnchorPane id="custom-titled-pane" styleClass="root" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tableapp.PersonTableController">
 	<children>
-		<Label id="custom-titled-pane-label" alignment="TOP_LEFT" layoutX="20.0" text="Persons Table" />
+		<Label id="custom-titled-pane-label" alignment="TOP_LEFT" layoutX="20.0" text="Employees" />
 
-		<AnchorPane maxHeight="300.0" maxWidth="500.0" minHeight="270.0" minWidth="280.0" prefHeight="270.0" prefWidth="280.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
+		<AnchorPane maxHeight="300.0" maxWidth="600.0" minHeight="270.0" minWidth="280.0" prefHeight="270.0" prefWidth="540.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
 			<VBox alignment="TOP_RIGHT" prefHeight="265.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 				<children>
 					<HBox alignment="CENTER_RIGHT" prefHeight="45.0">
@@ -60,7 +60,7 @@
 					  </children>
 					</HBox>
 
-					<TableView fx:id="table" prefHeight="200.0" prefWidth="270">
+					<TableView fx:id="table" prefHeight="200.0" prefWidth="530">
 						<columns>
 
 							<TableColumn fx:id="indexColumn" prefWidth="50.0" text="Index">
@@ -74,9 +74,27 @@
 									<PropertyValueFactory property="name" />
 								</cellValueFactory>
 							</TableColumn>
-							<TableColumn prefWidth="100.0" fx:id="ageColumn" text="Age">
+							<TableColumn prefWidth="50.0" fx:id="ageColumn" text="Age">
 								<cellValueFactory>
 									<PropertyValueFactory property="age" />
+								</cellValueFactory>
+							</TableColumn>
+
+							<TableColumn prefWidth="110.0" fx:id="departmentColumn" text="Department">
+								<cellValueFactory>
+									<PropertyValueFactory property="department" />
+								</cellValueFactory>
+							</TableColumn>
+
+							<TableColumn prefWidth="100.0" fx:id="joinedColumn" text="Joined">
+								<cellValueFactory>
+									<PropertyValueFactory property="joined" />
+								</cellValueFactory>
+							</TableColumn>
+
+							<TableColumn prefWidth="90.0" fx:id="salaryColumn" text="Salary (K)">
+								<cellValueFactory>
+									<PropertyValueFactory property="salary" />
 								</cellValueFactory>
 							</TableColumn>
 

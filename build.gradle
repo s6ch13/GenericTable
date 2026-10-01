@@ -16,7 +16,7 @@ apply plugin: 'eclipse'
 ext.jdkver = 25
 ext.jarName = "tableApp"	
 	
-project.version = '1.3.0.0'
+project.version = '1.4.0.0'
 
 ext.currentOS = org.gradle.internal.os.OperatingSystem.current()
 ext.arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH)						
@@ -112,6 +112,9 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
 }
 
 
